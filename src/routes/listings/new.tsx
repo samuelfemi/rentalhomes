@@ -15,7 +15,8 @@ import * as React from "react";
 export const Route = createFileRoute("/listings/new")({ component: NewListing });
 
 function NewListing() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
+  const isVerified = !!user?.email_verified;
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { toast } = useToast();
@@ -81,6 +82,19 @@ function NewListing() {
           <CardContent className="p-8 text-center">
             <p className="font-semibold">Sign in to list a home</p>
             <Button asChild className="mt-4"><a href="/auth/signin">Sign in</a></Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+  if (!isVerified) {
+    return (
+      <div className="mx-auto max-w-[720px] px-4 py-16 sm:px-6">
+        <Card>
+          <CardHeader><CardTitle>Verify email to list</CardTitle><CardDescription>You can browse listings now. Verify to publish.</CardDescription></CardHeader>
+          <CardContent className="p-8 text-center">
+            <p className="text-sm text-muted-foreground">Check inbox ({user?.email}) or API logs for the verification link.</p>
+            <Button asChild className="mt-4"><a href="/auth/verify">Go to verification</a></Button>
           </CardContent>
         </Card>
       </div>

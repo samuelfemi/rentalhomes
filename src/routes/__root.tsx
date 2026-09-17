@@ -6,6 +6,7 @@ import appCss from '../styles.css?url'
 import { QueryProvider } from '#/providers/query-provider'
 import { AuthProvider } from '#/lib/auth'
 import { Header } from '#/components/layout/header'
+import { VerifyBanner } from '#/components/layout/verify-banner'
 import { ToastProvider } from '#/components/ui/toast'
 
 export const Route = createRootRoute({
@@ -49,6 +50,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           <AuthProvider>
             <ToastProvider>
             <Header />
+            <VerifyBanner />
             <div className="min-h-[calc(100vh-64px)]">{children ?? <Outlet />}</div>
             <footer className="border-t bg-white">
               <div className="mx-auto flex max-w-[1280px] flex-col gap-2 px-4 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">

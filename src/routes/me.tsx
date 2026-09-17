@@ -136,7 +136,7 @@ function MePage() {
                   variant="outline"
                   size="sm"
                   className="gap-1.5"
-                  disabled={uploading || mutate.isPending}
+                  disabled={uploading || mutate.isPending || !user.email_verified}
                   onClick={() => fileRef.current?.click()}
                 >
                   {uploading ? (
@@ -152,11 +152,12 @@ function MePage() {
               </div>
             ) : null}
           </div>
+          {!user.email_verified ? <p className="rounded-md bg-amber-50 p-3 text-sm text-amber-800">Verify email to change avatar — updates are blocked until verified.</p> : null}
           <Label htmlFor="avatar">Avatar URL</Label>
-          <Input id="avatar" placeholder="https://..." value={url} onChange={(e) => setUrl(e.target.value)} />
+          <Input id="avatar" placeholder="https://..." value={url} onChange={(e) => setUrl(e.target.value)} disabled={!user.email_verified} />
           {msg ? <p className="text-sm text-emerald-600">{msg}</p> : null}
           {err ? <p className="text-sm text-destructive">{err}</p> : null}
-          <Button onClick={() => mutate.mutate(url)} disabled={mutate.isPending || uploading}>
+          <Button onClick={() => mutate.mutate(url)} disabled={mutate.isPending || uploading || !user.email_verified}>
             {mutate.isPending ? "Saving…" : "Save avatar"}
           </Button>
         </CardContent>

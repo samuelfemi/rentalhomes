@@ -5,6 +5,7 @@ import { Building2, Heart, LayoutDashboard, LogOut, Plus, User } from "lucide-re
 
 export function Header() {
   const { user, isAuthenticated, logout } = useAuth();
+  const isVerified = !!user?.email_verified;
   const navigate = useNavigate();
 
   return (
@@ -29,7 +30,7 @@ export function Header() {
           >
             Browse
           </Link>
-          {isAuthenticated ? (
+          {isAuthenticated && isVerified ? (
             <>
               <Link to="/favorites" className="rounded-md px-3 py-2 text-sm font-medium hover:bg-muted">
                 Favorites
@@ -38,23 +39,29 @@ export function Header() {
                 My listings
               </Link>
             </>
+          ) : isAuthenticated && !isVerified ? (
+            <span className="rounded-md bg-amber-100 px-3 py-1.5 text-xs font-semibold text-amber-800">Verify email to access favorites & listings</span>
           ) : null}
         </nav>
 
         <div className="flex items-center gap-2">
           {isAuthenticated ? (
             <>
-              <Button asChild size="sm" className="hidden sm:inline-flex">
-                <Link to="/listings/new">
-                  <Plus className="size-3.5" />
-                  List a home
-                </Link>
-              </Button>
-              <Button asChild size="icon-sm" variant="ghost" aria-label="Favorites" className="relative">
-                <Link to="/favorites">
-                  <Heart className="size-4" />
-                </Link>
-              </Button>
+              {isVerified ? (
+                <Button asChild size="sm" className="hidden sm:inline-flex">
+                  <Link to="/listings/new">
+                    <Plus className="size-3.5" />
+                    List a home
+                  </Link>
+                </Button>
+              ) : null}
+              {isVerified ? (
+                <Button asChild size="icon-sm" variant="ghost" aria-label="Favorites" className="relative">
+                  <Link to="/favorites">
+                    <Heart className="size-4" />
+                  </Link>
+                </Button>
+              ) : null}
               <div className="hidden items-center gap-2 sm:flex">
                 <Link
                   to="/me"
@@ -114,15 +121,19 @@ export function Header() {
           <Link to="/" className="rounded-md bg-muted px-3 py-1.5 text-xs font-semibold">
             Browse
           </Link>
-          <Link to="/favorites" className="rounded-md px-3 py-1.5 text-xs font-medium hover:bg-muted">
-            Favorites
-          </Link>
-          <Link to="/my-listings" className="rounded-md px-3 py-1.5 text-xs font-medium hover:bg-muted">
-            My listings
-          </Link>
-          <Link to="/listings/new" className="ml-auto rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground">
-            + List a home
-          </Link>
+          {isVerified ? (
+            <>
+              <Link to="/favorites" className="rounded-md px-3 py-1.5 text-xs font-medium hover:bg-muted">
+                Favorites
+              </Link>
+              <Link to="/my-listings" className="rounded-md px-3 py-1.5 text-xs font-medium hover:bg-muted">
+                My listings
+              </Link>
+              <Link to="/listings/new" className="ml-auto rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground">
+                + List a home
+              </Link>
+            </>
+          ) : null}
         </div>
       ) : null}
     </header>

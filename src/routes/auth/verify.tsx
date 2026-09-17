@@ -9,12 +9,21 @@ export const Route = createFileRoute("/auth/verify")({ component: Verify });
 function Verify() {
   const [state, setState] = React.useState<"idle" | "loading" | "ok" | "error">("idle");
   const [msg, setMsg] = React.useState("");
+  const fetchedRef = React.useRef(false);
 
   React.useEffect(() => {
-    const t = new URLSearchParams(window.location.search).get("token") || "";
+    const t = (new URLSearchParams(window.location.search).get("token") || "").trim();
     if (!t) return;
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
     setState("loading");
-    authApi.verify(t).then(() => { setState("ok"); setMsg("Email verified. You can now sign in."); }).catch((e: Error) => { setState("error"); setMsg(e.message); });
+    authApi.verify(t).then(() => { setState("ok"); setMsg("Email verified. You can now sign in."); }).catch((e: Error) => {
+      const m = e.message || "Verification failed";
+      const hint = m.toLowerCase().includes("invalid verification token")
+        ? `${m} — if you already verified, try signing in.`
+        : m;
+      setState("error"); setMsg(hint);
+    });
   }, []);
 
   return (

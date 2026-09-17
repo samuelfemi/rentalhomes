@@ -10,15 +10,31 @@ import { Heart } from "lucide-react";
 export const Route = createFileRoute("/favorites")({ component: FavoritesPage });
 
 function FavoritesPage() {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
+  const isVerified = !!user?.email_verified;
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["favorites"],
     queryFn: () => favoritesApi.list(1, 20),
-    enabled: isAuthenticated,
+    enabled: isAuthenticated && isVerified,
   });
 
   if (authLoading) return <div className="mx-auto max-w-[1280px] px-4 py-10 sm:px-6">Loading…</div>;
+
+  if (isAuthenticated && !isVerified) {
+    return (
+      <div className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6">
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-10 text-center">
+          <h1 className="text-xl font-bold">Verify your email to use favorites</h1>
+          <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">You can browse listings now. Verify your email (check inbox or API logs for the link) to save favorites.</p>
+          <Button asChild className="mt-4">
+            <Link to="/auth/verify">Verify email</Link>
+          </Button>
+          {isError ? <p className="mt-3 text-sm text-destructive">{errorMessage(error)}</p> : null}
+        </div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return (

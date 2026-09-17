@@ -16,6 +16,7 @@ export const Route = createFileRoute("/listings/$id")({ component: DetailPage })
 function DetailPage() {
   const { id } = Route.useParams();
   const { isAuthenticated, user } = useAuth();
+  const isVerified = !!user?.email_verified;
   const qc = useQueryClient();
   const { toast } = useToast();
   const [active, setActive] = React.useState(0);
@@ -143,18 +144,21 @@ function DetailPage() {
                     <MapPin className="size-4" /> {listing.address}
                   </p>
                 </div>
-                {isAuthenticated ? (
+                {isAuthenticated && isVerified ? (
                   <Button
                     size="icon"
                     variant="outline"
                     aria-label="Favorite"
                     onClick={() => {
                       if (favAdd.isPending || favRemove.isPending) return;
-                      // naive toggle: try add, fallback remove on 409? API is idempotent — we just toggle via two buttons? simplicity: add
                       favAdd.mutate();
                     }}
                     title="Save to favorites"
                   >
+                    <Heart className="size-4" />
+                  </Button>
+                ) : isAuthenticated && !isVerified ? (
+                  <Button size="icon" variant="outline" disabled title="Verify email to favorite">
                     <Heart className="size-4" />
                   </Button>
                 ) : null}
@@ -216,7 +220,13 @@ function DetailPage() {
                 </div>
               ) : null}
 
-              {landlord_name || landlord_phone ? (
+              {isAuthenticated && !isVerified ? (
+                <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-amber-700">Landlord contact locked</p>
+                  <p className="mt-1 text-sm text-amber-900">Verify your email to see landlord phone and name.</p>
+                  <Link to="/auth/verify" className="text-sm font-semibold text-primary hover:underline">Verify email</Link>
+                </div>
+              ) : landlord_name || landlord_phone ? (
                 <div className="mt-4 rounded-xl border bg-muted/40 p-4">
                   <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Landlord</p>
                   <p className="mt-1 font-semibold">{landlord_name ?? "Landlord"}</p>
@@ -242,10 +252,11 @@ function DetailPage() {
                   variant="outline"
                   size="sm"
                   onClick={() => {
-                    if (!isAuthenticated) return;
+                    if (!isAuthenticated || !isVerified) return;
                     favAdd.mutate();
                   }}
-                  disabled={favAdd.isPending}
+                  disabled={favAdd.isPending || (isAuthenticated && !isVerified)}
+                  title={isAuthenticated && !isVerified ? "Verify email to favorite" : undefined}
                 >
                   Save
                 </Button>
@@ -253,10 +264,10 @@ function DetailPage() {
                   variant="ghost"
                   size="sm"
                   onClick={() => {
-                    if (!isAuthenticated) return;
+                    if (!isAuthenticated || !isVerified) return;
                     favRemove.mutate();
                   }}
-                  disabled={favRemove.isPending}
+                  disabled={favRemove.isPending || (isAuthenticated && !isVerified)}
                 >
                   Unsave
                 </Button>
