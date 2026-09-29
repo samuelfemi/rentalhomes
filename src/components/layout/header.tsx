@@ -1,12 +1,12 @@
-import { Link, useNavigate } from "@tanstack/react-router";
-import { Button } from "#/components/ui/button";
-import { useAuth } from "#/lib/auth";
-import { Building2, Heart, LayoutDashboard, LogOut, Plus, User } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router"
+import { Building2, Heart, LayoutDashboard, LogOut, Plus, User } from "lucide-react"
+import { Button } from "#/components/ui/button"
+import { useAuth } from "#/lib/auth"
 
 export function Header() {
-  const { user, isAuthenticated, logout } = useAuth();
-  const isVerified = !!user?.email_verified;
-  const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuth()
+  const isVerified = !!user?.email_verified
+  const navigate = useNavigate()
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -40,7 +40,9 @@ export function Header() {
               </Link>
             </>
           ) : isAuthenticated && !isVerified ? (
-            <span className="rounded-md bg-amber-100 px-3 py-1.5 text-xs font-semibold text-amber-800">Verify email to access favorites & listings</span>
+            <span className="rounded-md bg-amber-100 px-3 py-1.5 text-xs font-semibold text-amber-800">
+              Verify email to access favorites & listings
+            </span>
           ) : null}
         </nav>
 
@@ -81,8 +83,8 @@ export function Header() {
                   size="icon-sm"
                   aria-label="Sign out"
                   onClick={async () => {
-                    await logout();
-                    navigate({ to: "/" });
+                    await logout()
+                    navigate({ to: "/" })
                   }}
                 >
                   <LogOut className="size-4" />
@@ -129,7 +131,10 @@ export function Header() {
               <Link to="/my-listings" className="rounded-md px-3 py-1.5 text-xs font-medium hover:bg-muted">
                 My listings
               </Link>
-              <Link to="/listings/new" className="ml-auto rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground">
+              <Link
+                to="/listings/new"
+                className="ml-auto rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground"
+              >
                 + List a home
               </Link>
             </>
@@ -137,5 +142,5 @@ export function Header() {
         </div>
       ) : null}
     </header>
-  );
+  )
 }

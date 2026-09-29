@@ -1,42 +1,47 @@
-import * as React from "react";
-import { AlertCircle, CheckCircle2, Info, X } from "lucide-react";
-import { cn } from "cn";
+import { cn } from "cn"
+import { AlertCircle, CheckCircle2, Info, X } from "lucide-react"
+import * as React from "react"
 
-type ToastVariant = "success" | "error" | "info";
+type ToastVariant = "success" | "error" | "info"
 
 type ToastItem = {
-  id: number;
-  title: string;
-  description?: string;
-  variant: ToastVariant;
-};
+  id: number
+  title: string
+  description?: string
+  variant: ToastVariant
+}
 
 type ToastContextValue = {
-  toast: (title: string, opts?: { description?: string; variant?: ToastVariant }) => void;
-};
+  toast: (title: string, opts?: { description?: string; variant?: ToastVariant }) => void
+}
 
-const ToastContext = React.createContext<ToastContextValue | null>(null);
+const ToastContext = React.createContext<ToastContextValue | null>(null)
 
-let nextId = 1;
+let nextId = 1
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
-  const [toasts, setToasts] = React.useState<ToastItem[]>([]);
+  const [toasts, setToasts] = React.useState<ToastItem[]>([])
 
   const dismiss = React.useCallback((id: number) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-  }, []);
+    setToasts((prev) => prev.filter((t) => t.id !== id))
+  }, [])
 
   const toast = React.useCallback(
     (title: string, opts?: { description?: string; variant?: ToastVariant }) => {
-      const id = nextId++;
-      const item: ToastItem = { id, title, description: opts?.description, variant: opts?.variant ?? "success" };
-      setToasts((prev) => [...prev.slice(-2), item]);
-      window.setTimeout(() => dismiss(id), 3500);
+      const id = nextId++
+      const item: ToastItem = {
+        id,
+        title,
+        description: opts?.description,
+        variant: opts?.variant ?? "success",
+      }
+      setToasts((prev) => [...prev.slice(-2), item])
+      window.setTimeout(() => dismiss(id), 3500)
     },
     [dismiss],
-  );
+  )
 
-  const value = React.useMemo(() => ({ toast }), [toast]);
+  const value = React.useMemo(() => ({ toast }), [toast])
 
   return (
     <ToastContext.Provider value={value}>
@@ -79,11 +84,11 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         ))}
       </div>
     </ToastContext.Provider>
-  );
+  )
 }
 
 export function useToast() {
-  const ctx = React.useContext(ToastContext);
-  if (!ctx) throw new Error("useToast must be inside ToastProvider");
-  return ctx;
+  const ctx = React.useContext(ToastContext)
+  if (!ctx) throw new Error("useToast must be inside ToastProvider")
+  return ctx
 }

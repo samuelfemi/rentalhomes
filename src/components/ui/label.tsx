@@ -1,7 +1,15 @@
-import * as React from "react";
-import { cn } from "cn";
+import { cn } from "cn"
+import type * as React from "react"
 
 function Label({ className, ...props }: React.ComponentProps<"label">) {
-  return <label className={cn("text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70", className)} {...props} />;
+  return (
+    <label
+      className={cn(
+        "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+        className,
+      )}
+      {...props}
+    />
+  )
 }
-export { Label };
+export { Label }

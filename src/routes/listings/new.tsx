@@ -1,25 +1,27 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { listingsApi } from "#/lib/api";
-import { useAuth } from "#/lib/auth";
-import { useToast } from "#/components/ui/toast";
-import { Button } from "#/components/ui/button";
-import { Input } from "#/components/ui/input";
-import { Label } from "#/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "#/components/ui/card";
-import { MapPicker, LAGOS_CENTER } from "#/components/listing/map-picker";
-import { PhotoInput } from "#/components/listing/photo-input";
-import { LocateFixed } from "lucide-react";
-import * as React from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import { LocateFixed } from "lucide-react"
+import * as React from "react"
+import { LAGOS_CENTER, MapPicker } from "#/components/listing/map-picker"
+import { PhotoInput } from "#/components/listing/photo-input"
+import { Button } from "#/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "#/components/ui/card"
+import { Input } from "#/components/ui/input"
+import { Label } from "#/components/ui/label"
+import { useToast } from "#/components/ui/toast"
+import { listingsApi } from "#/lib/api"
+import { useAuth } from "#/lib/auth"
 
-export const Route = createFileRoute("/listings/new")({ component: NewListing });
+export const Route = createFileRoute("/listings/new")({
+  component: NewListing,
+})
 
 function NewListing() {
-  const { isAuthenticated, isLoading, user } = useAuth();
-  const isVerified = !!user?.email_verified;
-  const navigate = useNavigate();
-  const qc = useQueryClient();
-  const { toast } = useToast();
+  const { isAuthenticated, isLoading, user } = useAuth()
+  const isVerified = !!user?.email_verified
+  const navigate = useNavigate()
+  const qc = useQueryClient()
+  const { toast } = useToast()
   const [form, setForm] = React.useState({
     title: "",
     description: "",
@@ -27,12 +29,15 @@ function NewListing() {
     rooms: "2",
     furnished: "false",
     address: "",
-  });
-  const [coords, setCoords] = React.useState({ lat: LAGOS_CENTER.lat, lng: LAGOS_CENTER.lng });
-  const [imageUrls, setImageUrls] = React.useState<string[]>([]);
-  const [error, setError] = React.useState<string | null>(null);
-  const [phase, setPhase] = React.useState<"idle" | "publishing" | "photos">("idle");
-  const [locating, setLocating] = React.useState(false);
+  })
+  const [coords, setCoords] = React.useState({
+    lat: LAGOS_CENTER.lat,
+    lng: LAGOS_CENTER.lng,
+  })
+  const [imageUrls, setImageUrls] = React.useState<string[]>([])
+  const [error, setError] = React.useState<string | null>(null)
+  const [phase, setPhase] = React.useState<"idle" | "publishing" | "photos">("idle")
+  const [locating, setLocating] = React.useState(false)
 
   const create = useMutation({
     mutationFn: async () => {
@@ -45,90 +50,106 @@ function NewListing() {
         latitude: coords.lat,
         longitude: coords.lng,
         address: form.address.trim(),
-      });
-      const urls = imageUrls.map((u) => u.trim()).filter(Boolean);
+      })
+      const urls = imageUrls.map((u) => u.trim()).filter(Boolean)
       if (urls.length > 0) {
-        setPhase("photos");
+        setPhase("photos")
         const results = await Promise.allSettled(
           urls.map((url, i) => listingsApi.addMedia(listing.id, { url, type: "image", order: i })),
-        );
-        const failed = results.filter((r) => r.status === "rejected").length;
+        )
+        const failed = results.filter((r) => r.status === "rejected").length
         if (failed > 0) {
           toast("Listing published, some photos failed", {
             description: `${urls.length - failed}/${urls.length} photos attached. You can add more from the listing page.`,
             variant: "error",
-          });
+          })
         }
       }
-      return listing;
+      return listing
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["listings"] });
-      qc.invalidateQueries({ queryKey: ["my-listings"] });
-      toast("Listing published", { description: "Your home is now visible to renters." });
-      navigate({ to: "/" });
+      qc.invalidateQueries({ queryKey: ["listings"] })
+      qc.invalidateQueries({ queryKey: ["my-listings"] })
+      toast("Listing published", {
+        description: "Your home is now visible to renters.",
+      })
+      navigate({ to: "/" })
     },
     onError: (e: Error) => {
-      setPhase("idle");
-      setError(e.message);
+      setPhase("idle")
+      setError(e.message)
     },
-  });
+  })
 
-  if (isLoading) return <div className="mx-auto max-w-[720px] px-4 py-10 sm:px-6">Loading…</div>;
+  if (isLoading) return <div className="mx-auto max-w-[720px] px-4 py-10 sm:px-6">Loading…</div>
   if (!isAuthenticated) {
     return (
       <div className="mx-auto max-w-[720px] px-4 py-16 sm:px-6">
         <Card>
           <CardContent className="p-8 text-center">
             <p className="font-semibold">Sign in to list a home</p>
-            <Button asChild className="mt-4"><a href="/auth/signin">Sign in</a></Button>
+            <Button asChild className="mt-4">
+              <a href="/auth/signin">Sign in</a>
+            </Button>
           </CardContent>
         </Card>
       </div>
-    );
+    )
   }
   if (!isVerified) {
     return (
       <div className="mx-auto max-w-[720px] px-4 py-16 sm:px-6">
         <Card>
-          <CardHeader><CardTitle>Verify email to list</CardTitle><CardDescription>You can browse listings now. Verify to publish.</CardDescription></CardHeader>
+          <CardHeader>
+            <CardTitle>Verify email to list</CardTitle>
+            <CardDescription>You can browse listings now. Verify to publish.</CardDescription>
+          </CardHeader>
           <CardContent className="p-8 text-center">
-            <p className="text-sm text-muted-foreground">Check inbox ({user?.email}) or API logs for the verification link.</p>
-            <Button asChild className="mt-4"><a href="/auth/verify">Go to verification</a></Button>
+            <p className="text-sm text-muted-foreground">
+              Check inbox ({user?.email}) or API logs for the verification link.
+            </p>
+            <Button asChild className="mt-4">
+              <a href="/auth/verify">Go to verification</a>
+            </Button>
           </CardContent>
         </Card>
       </div>
-    );
+    )
   }
 
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setPhase("publishing");
-    create.mutate();
-  };
+  const onSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setError(null)
+    setPhase("publishing")
+    create.mutate()
+  }
 
   const useMyLocation = () => {
     if (!navigator.geolocation) {
-      toast("Geolocation not supported", { variant: "error" });
-      return;
+      toast("Geolocation not supported", { variant: "error" })
+      return
     }
-    setLocating(true);
+    setLocating(true)
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-        setLocating(false);
-        toast("Location set", { description: "Pin moved to your current position." });
+        setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+        setLocating(false)
+        toast("Location set", {
+          description: "Pin moved to your current position.",
+        })
       },
       () => {
-        setLocating(false);
-        toast("Could not get location", { description: "Check browser permission and try again.", variant: "error" });
+        setLocating(false)
+        toast("Could not get location", {
+          description: "Check browser permission and try again.",
+          variant: "error",
+        })
       },
       { timeout: 10000 },
-    );
-  };
+    )
+  }
 
-  const busy = phase !== "idle";
+  const busy = phase !== "idle"
 
   return (
     <div className="mx-auto max-w-[720px] px-4 py-6 sm:px-6">
@@ -144,7 +165,14 @@ function NewListing() {
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="title">Title</Label>
-              <Input id="title" required minLength={3} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="2-bedroom flat in Yaba" />
+              <Input
+                id="title"
+                required
+                minLength={3}
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
+                placeholder="2-bedroom flat in Yaba"
+              />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="description">Description</Label>
@@ -161,31 +189,62 @@ function NewListing() {
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="price">Price (₦ per year)</Label>
-                <Input id="price" required inputMode="numeric" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="2500000" />
+                <Input
+                  id="price"
+                  required
+                  inputMode="numeric"
+                  value={form.price}
+                  onChange={(e) => setForm({ ...form, price: e.target.value })}
+                  placeholder="2500000"
+                />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="rooms">Beds</Label>
-                <Input id="rooms" type="number" min={0} value={form.rooms} onChange={(e) => setForm({ ...form, rooms: e.target.value })} />
+                <Input
+                  id="rooms"
+                  type="number"
+                  min={0}
+                  value={form.rooms}
+                  onChange={(e) => setForm({ ...form, rooms: e.target.value })}
+                />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="furnished">Furnished</Label>
-                <select id="furnished" value={form.furnished} onChange={(e) => setForm({ ...form, furnished: e.target.value })} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                <select
+                  id="furnished"
+                  value={form.furnished}
+                  onChange={(e) => setForm({ ...form, furnished: e.target.value })}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                >
                   <option value="false">No</option>
                   <option value="true">Yes</option>
                 </select>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="address">Address</Label>
-                <Input id="address" required value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="12 Herbert Macaulay Way, Yaba" />
+                <Input
+                  id="address"
+                  required
+                  value={form.address}
+                  onChange={(e) => setForm({ ...form, address: e.target.value })}
+                  placeholder="12 Herbert Macaulay Way, Yaba"
+                />
               </div>
             </div>
 
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <Label>Pin the location</Label>
-                <Button type="button" variant="ghost" size="xs" onClick={useMyLocation} disabled={locating} className="gap-1">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="xs"
+                  onClick={useMyLocation}
+                  disabled={locating}
+                  className="gap-1"
+                >
                   <LocateFixed className="size-3.5" />
                   {locating ? "Locating…" : "Use my location"}
                 </Button>
@@ -198,7 +257,12 @@ function NewListing() {
               <PhotoInput
                 urls={imageUrls}
                 onChange={setImageUrls}
-                onUploadError={(message) => toast("Upload failed", { description: message, variant: "error" })}
+                onUploadError={(message) =>
+                  toast("Upload failed", {
+                    description: message,
+                    variant: "error",
+                  })
+                }
               />
             </div>
 
@@ -211,5 +275,5 @@ function NewListing() {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

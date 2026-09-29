@@ -1,5 +1,5 @@
-import * as React from "react";
-import { cn } from "cn";
+import { cn } from "cn"
+import type * as React from "react"
 
 function NativeSelect({ className, children, ...props }: React.ComponentProps<"select">) {
   return (
@@ -13,6 +13,6 @@ function NativeSelect({ className, children, ...props }: React.ComponentProps<"s
     >
       {children}
     </select>
-  );
+  )
 }
-export { NativeSelect as Select };
+export { NativeSelect as Select }

@@ -1,9 +1,9 @@
-import * as React from "react";
-import { Button } from "#/components/ui/button";
-import { Input } from "#/components/ui/input";
-import { isCloudinaryConfigured, uploadImageToCloudinary } from "#/lib/cloudinary";
-import { errorMessage } from "#/lib/errors";
-import { ImagePlus, Loader2, Trash2, Upload } from "lucide-react";
+import { ImagePlus, Loader2, Trash2, Upload } from "lucide-react"
+import * as React from "react"
+import { Button } from "#/components/ui/button"
+import { Input } from "#/components/ui/input"
+import { isCloudinaryConfigured, uploadImageToCloudinary } from "#/lib/cloudinary"
+import { errorMessage } from "#/lib/errors"
 
 /**
  * Collect listing photos: direct file upload to Cloudinary when the
@@ -15,64 +15,64 @@ export function PhotoInput({
   onChange,
   onUploadError,
 }: {
-  urls: string[];
-  onChange: (urls: string[]) => void;
-  onUploadError?: (message: string) => void;
+  urls: string[]
+  onChange: (urls: string[]) => void
+  onUploadError?: (message: string) => void
 }) {
-  const [uploading, setUploading] = React.useState(0);
-  const [link, setLink] = React.useState("");
-  const [linkError, setLinkError] = React.useState<string | null>(null);
-  const fileRef = React.useRef<HTMLInputElement>(null);
-  const cloudReady = isCloudinaryConfigured();
+  const [uploading, setUploading] = React.useState(0)
+  const [link, setLink] = React.useState("")
+  const [linkError, setLinkError] = React.useState<string | null>(null)
+  const fileRef = React.useRef<HTMLInputElement>(null)
+  const cloudReady = isCloudinaryConfigured()
 
   const handleFiles = async (files: FileList | null) => {
-    if (!files || files.length === 0) return;
-    const list = Array.from(files);
-    setUploading((n) => n + list.length);
+    if (!files || files.length === 0) return
+    const list = Array.from(files)
+    setUploading((n) => n + list.length)
     // Slots preserve selection order while uploads race; lastPublished lets
     // each progressive update replace (not duplicate) our earlier appends
     // without clobbering edits the parent made meanwhile.
-    const slots: (string | undefined)[] = list.map(() => undefined);
-    let lastPublished: string[] = [];
+    const slots: (string | undefined)[] = list.map(() => undefined)
+    let lastPublished: string[] = []
     const publish = () => {
-      const fresh = urlsRef.current.filter((u) => !lastPublished.includes(u));
-      const ours = slots.filter((u): u is string => u !== undefined);
-      lastPublished = ours;
-      onChange([...fresh, ...ours]);
-    };
+      const fresh = urlsRef.current.filter((u) => !lastPublished.includes(u))
+      const ours = slots.filter((u): u is string => u !== undefined)
+      lastPublished = ours
+      onChange([...fresh, ...ours])
+    }
     await Promise.allSettled(
       list.map(async (file, i) => {
         try {
-          slots[i] = await uploadImageToCloudinary(file);
-          publish();
+          slots[i] = await uploadImageToCloudinary(file)
+          publish()
         } catch (err) {
-          onUploadError?.(errorMessage(err, "Upload failed"));
+          onUploadError?.(errorMessage(err, "Upload failed"))
         } finally {
-          setUploading((n) => Math.max(0, n - 1));
+          setUploading((n) => Math.max(0, n - 1))
         }
       }),
-    );
-    if (fileRef.current) fileRef.current.value = "";
-  };
+    )
+    if (fileRef.current) fileRef.current.value = ""
+  }
 
   // onChange identity changes each render — keep a ref so the async
   // loop above always appends to the latest list.
-  const urlsRef = React.useRef(urls);
-  urlsRef.current = urls;
+  const urlsRef = React.useRef(urls)
+  urlsRef.current = urls
 
   const addLink = () => {
-    const trimmed = link.trim();
+    const trimmed = link.trim()
     try {
-      const u = new URL(trimmed);
-      if (u.protocol !== "http:" && u.protocol !== "https:") throw new Error();
+      const u = new URL(trimmed)
+      if (u.protocol !== "http:" && u.protocol !== "https:") throw new Error()
     } catch {
-      setLinkError("Enter a valid http(s) image link.");
-      return;
+      setLinkError("Enter a valid http(s) image link.")
+      return
     }
-    setLinkError(null);
-    onChange([...urls, trimmed]);
-    setLink("");
-  };
+    setLinkError(null)
+    onChange([...urls, trimmed])
+    setLink("")
+  }
 
   return (
     <div className="space-y-3">
@@ -108,15 +108,18 @@ export function PhotoInput({
         </div>
       ) : (
         <p className="rounded-md border border-dashed bg-muted/40 p-3 text-xs leading-relaxed text-muted-foreground">
-          Direct upload needs <code>VITE_CLOUDINARY_CLOUD_NAME</code> + <code>VITE_CLOUDINARY_UPLOAD_PRESET</code> in the
-          frontend env — until then, paste image links below.
+          Direct upload needs <code>VITE_CLOUDINARY_CLOUD_NAME</code> + <code>VITE_CLOUDINARY_UPLOAD_PRESET</code> in
+          the frontend env — until then, paste image links below.
         </p>
       )}
 
       {urls.length > 0 ? (
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
           {urls.map((url, i) => (
-            <div key={`${i}-${url}`} className="group relative aspect-square overflow-hidden rounded-lg border bg-muted">
+            <div
+              key={`${i}-${url}`}
+              className="group relative aspect-square overflow-hidden rounded-lg border bg-muted"
+            >
               <img src={url} alt={`Photo ${i + 1}`} className="h-full w-full object-cover" />
               {i === 0 ? (
                 <span className="absolute left-1.5 top-1.5 rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-bold text-white">
@@ -150,5 +153,5 @@ export function PhotoInput({
       </div>
       {linkError ? <p className="text-xs text-destructive">{linkError}</p> : null}
     </div>
-  );
+  )
 }

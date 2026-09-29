@@ -1,20 +1,26 @@
-import { Link } from "@tanstack/react-router";
-import { Badge } from "#/components/ui/badge";
-import { formatPrice, type Listing, type ListingStatus } from "#/lib/api";
-import { BedDouble, Heart, MapPin, Sofa } from "lucide-react";
-import { cn } from "cn";
+import { Link } from "@tanstack/react-router"
+import { cn } from "cn"
+import { BedDouble, Heart, MapPin, Sofa } from "lucide-react"
+import { Badge } from "#/components/ui/badge"
+import { formatPrice, type Listing, type ListingStatus } from "#/lib/api"
 
-type StatusBadge = { label: string; variant: "success" | "secondary" | "warning" };
-type StatusLabels = { [status in ListingStatus]: StatusBadge };
+type StatusBadge = {
+  label: string
+  variant: "success" | "secondary" | "warning"
+}
+type StatusLabels = { [status in ListingStatus]: StatusBadge }
 
 const statusLabel: StatusLabels = {
   avaiable: { label: "Available", variant: "success" },
   rented: { label: "Rented", variant: "secondary" },
   inative: { label: "Inactive", variant: "warning" },
-};
+}
 
 export function ListingCard({ listing }: { listing: Listing }) {
-  const s = statusLabel[listing.status] ?? { label: listing.status, variant: "secondary" as const };
+  const s = statusLabel[listing.status] ?? {
+    label: listing.status,
+    variant: "secondary" as const,
+  }
   return (
     <Link
       to="/listings/$id"
@@ -75,12 +81,15 @@ export function ListingCard({ listing }: { listing: Listing }) {
             {listing.rooms ?? 0} {listing.rooms === 1 ? "bed" : "beds"}
           </span>
           <span className="ml-auto text-xs text-muted-foreground">
-            {new Date(listing.created_at).toLocaleDateString("en-NG", { month: "short", day: "numeric" })}
+            {new Date(listing.created_at).toLocaleDateString("en-NG", {
+              month: "short",
+              day: "numeric",
+            })}
           </span>
         </div>
       </div>
     </Link>
-  );
+  )
 }
 
 export function ListingSkeleton() {
@@ -93,5 +102,5 @@ export function ListingSkeleton() {
         <div className="h-3 w-2/3 animate-pulse rounded bg-muted" />
       </div>
     </div>
-  );
+  )
 }

@@ -1,18 +1,18 @@
-import { Input } from "#/components/ui/input";
-import { Select } from "#/components/ui/select";
-import { Button } from "#/components/ui/button";
-import { Search, SlidersHorizontal, X } from "lucide-react";
-import * as React from "react";
+import { Search, SlidersHorizontal, X } from "lucide-react"
+import * as React from "react"
+import { Button } from "#/components/ui/button"
+import { Input } from "#/components/ui/input"
+import { Select } from "#/components/ui/select"
 
 export type FilterValues = {
-  search: string;
-  status: string;
-  furnished: string;
-  minPrice: string;
-  maxPrice: string;
-  rooms: string;
-  minRooms: string;
-};
+  search: string
+  status: string
+  furnished: string
+  minPrice: string
+  maxPrice: string
+  rooms: string
+  minRooms: string
+}
 
 export function ListingFilters({
   values,
@@ -20,14 +20,14 @@ export function ListingFilters({
   onReset,
   total,
 }: {
-  values: FilterValues;
-  onChange: (patch: Partial<FilterValues>) => void;
-  onReset: () => void;
-  total?: number;
+  values: FilterValues
+  onChange: (patch: Partial<FilterValues>) => void
+  onReset: () => void
+  total?: number
 }) {
-  const [showAdvanced, setShowAdvanced] = React.useState(false);
+  const [showAdvanced, setShowAdvanced] = React.useState(false)
   const hasActive =
-    values.status || values.furnished || values.minPrice || values.maxPrice || values.rooms || values.minRooms;
+    values.status || values.furnished || values.minPrice || values.maxPrice || values.rooms || values.minRooms
 
   return (
     <div className="rounded-2xl border bg-card p-3 sm:p-4">
@@ -125,5 +125,5 @@ export function ListingFilters({
         )}
       </div>
     </div>
-  );
+  )
 }

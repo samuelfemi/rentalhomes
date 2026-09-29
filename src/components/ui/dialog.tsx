@@ -1,18 +1,18 @@
-import * as React from "react";
-import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
-import { X } from "lucide-react";
-import { cn } from "cn";
+import { Dialog as DialogPrimitive } from "@base-ui/react/dialog"
+import { cn } from "cn"
+import { X } from "lucide-react"
+import type * as React from "react"
 
 function Dialog(props: DialogPrimitive.Root.Props) {
-  return <DialogPrimitive.Root data-slot="dialog" {...props} />;
+  return <DialogPrimitive.Root data-slot="dialog" {...props} />
 }
 
 function DialogTrigger(props: DialogPrimitive.Trigger.Props) {
-  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />;
+  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
 }
 
 function DialogPortal(props: DialogPrimitive.Portal.Props) {
-  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />;
+  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
 }
 
 function DialogBackdrop({ className, ...props }: DialogPrimitive.Backdrop.Props) {
@@ -25,7 +25,7 @@ function DialogBackdrop({ className, ...props }: DialogPrimitive.Backdrop.Props)
       )}
       {...props}
     />
-  );
+  )
 }
 
 function DialogPopup({ className, children, ...props }: DialogPrimitive.Popup.Props) {
@@ -51,19 +51,37 @@ function DialogPopup({ className, children, ...props }: DialogPrimitive.Popup.Pr
         </DialogPrimitive.Popup>
       </div>
     </DialogPortal>
-  );
+  )
 }
 
 function DialogTitle({ className, ...props }: DialogPrimitive.Title.Props) {
-  return <DialogPrimitive.Title data-slot="dialog-title" className={cn("text-lg font-bold tracking-tight", className)} {...props} />;
+  return (
+    <DialogPrimitive.Title
+      data-slot="dialog-title"
+      className={cn("text-lg font-bold tracking-tight", className)}
+      {...props}
+    />
+  )
 }
 
 function DialogDescription({ className, ...props }: DialogPrimitive.Description.Props) {
-  return <DialogPrimitive.Description data-slot="dialog-description" className={cn("mt-1 text-sm text-muted-foreground", className)} {...props} />;
+  return (
+    <DialogPrimitive.Description
+      data-slot="dialog-description"
+      className={cn("mt-1 text-sm text-muted-foreground", className)}
+      {...props}
+    />
+  )
 }
 
 function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="dialog-footer" className={cn("mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)} {...props} />;
+  return (
+    <div
+      data-slot="dialog-footer"
+      className={cn("mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)}
+      {...props}
+    />
+  )
 }
 
-export { Dialog, DialogTrigger, DialogPopup, DialogTitle, DialogDescription, DialogFooter };
+export { Dialog, DialogTrigger, DialogPopup, DialogTitle, DialogDescription, DialogFooter }

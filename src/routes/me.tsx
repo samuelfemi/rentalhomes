@@ -1,66 +1,66 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useAuth } from "#/lib/auth";
-import { authApi } from "#/lib/api";
-import { useMutation } from "@tanstack/react-query";
-import { Button } from "#/components/ui/button";
-import { Input } from "#/components/ui/input";
-import { Label } from "#/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "#/components/ui/card";
-import { isCloudinaryConfigured, uploadImageToCloudinary } from "#/lib/cloudinary";
-import { errorMessage } from "#/lib/errors";
-import { useToast } from "#/components/ui/toast";
-import { Loader2, Upload } from "lucide-react";
-import * as React from "react";
+import { useMutation } from "@tanstack/react-query"
+import { createFileRoute } from "@tanstack/react-router"
+import { Loader2, Upload } from "lucide-react"
+import * as React from "react"
+import { Button } from "#/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "#/components/ui/card"
+import { Input } from "#/components/ui/input"
+import { Label } from "#/components/ui/label"
+import { useToast } from "#/components/ui/toast"
+import { authApi } from "#/lib/api"
+import { useAuth } from "#/lib/auth"
+import { isCloudinaryConfigured, uploadImageToCloudinary } from "#/lib/cloudinary"
+import { errorMessage } from "#/lib/errors"
 
-export const Route = createFileRoute("/me")({ component: MePage });
+export const Route = createFileRoute("/me")({ component: MePage })
 
 function MePage() {
-  const { user, isAuthenticated, isLoading, refreshUser } = useAuth();
-  const { toast } = useToast();
-  const [url, setUrl] = React.useState("");
-  const [msg, setMsg] = React.useState<string | null>(null);
-  const [err, setErr] = React.useState<string | null>(null);
-  const [uploading, setUploading] = React.useState(false);
-  const fileRef = React.useRef<HTMLInputElement>(null);
+  const { user, isAuthenticated, isLoading, refreshUser } = useAuth()
+  const { toast } = useToast()
+  const [url, setUrl] = React.useState("")
+  const [msg, setMsg] = React.useState<string | null>(null)
+  const [err, setErr] = React.useState<string | null>(null)
+  const [uploading, setUploading] = React.useState(false)
+  const fileRef = React.useRef<HTMLInputElement>(null)
 
   React.useEffect(() => {
-    if (user?.avatar_url) setUrl(user.avatar_url);
-  }, [user?.avatar_url]);
+    if (user?.avatar_url) setUrl(user.avatar_url)
+  }, [user?.avatar_url])
 
   const mutate = useMutation({
     mutationFn: (avatarUrl: string) => authApi.updateAvatar(avatarUrl.trim()),
     onSuccess: () => {
-      setMsg("Avatar updated");
-      setErr(null);
-      refreshUser();
+      setMsg("Avatar updated")
+      setErr(null)
+      refreshUser()
     },
     onError: (e: Error) => {
-      setErr(e.message);
-      setMsg(null);
+      setErr(e.message)
+      setMsg(null)
     },
-  });
+  })
 
   const handleFile = async (files: FileList | null) => {
-    const file = files?.[0];
-    if (!file) return;
-    setUploading(true);
-    setErr(null);
+    const file = files?.[0]
+    if (!file) return
+    setUploading(true)
+    setErr(null)
     try {
-      const secureUrl = await uploadImageToCloudinary(file);
-      setUrl(secureUrl);
-      mutate.mutate(secureUrl);
-      toast("Profile photo updated");
+      const secureUrl = await uploadImageToCloudinary(file)
+      setUrl(secureUrl)
+      mutate.mutate(secureUrl)
+      toast("Profile photo updated")
     } catch (e) {
-      const message = errorMessage(e, "Upload failed");
-      setErr(message);
-      toast("Upload failed", { description: message, variant: "error" });
+      const message = errorMessage(e, "Upload failed")
+      setErr(message)
+      toast("Upload failed", { description: message, variant: "error" })
     } finally {
-      setUploading(false);
-      if (fileRef.current) fileRef.current.value = "";
+      setUploading(false)
+      if (fileRef.current) fileRef.current.value = ""
     }
-  };
+  }
 
-  if (isLoading) return <div className="mx-auto max-w-[720px] px-4 py-10 sm:px-6">Loading…</div>;
+  if (isLoading) return <div className="mx-auto max-w-[720px] px-4 py-10 sm:px-6">Loading…</div>
   if (!isAuthenticated || !user) {
     return (
       <div className="mx-auto max-w-[720px] px-4 py-16 sm:px-6">
@@ -73,7 +73,7 @@ function MePage() {
           </CardContent>
         </Card>
       </div>
-    );
+    )
   }
 
   return (
@@ -93,7 +93,9 @@ function MePage() {
             )}
             {user.full_name}
           </CardTitle>
-          <CardDescription>{user.email} • {user.phone}</CardDescription>
+          <CardDescription>
+            {user.email} • {user.phone}
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
           <div className="grid grid-cols-2 gap-3">
@@ -103,7 +105,11 @@ function MePage() {
             </div>
             <div className="rounded-lg border p-3">
               <p className="text-xs text-muted-foreground">Member since</p>
-              <p className="font-semibold">{new Date(user.created_at).toLocaleDateString("en-NG", { dateStyle: "medium" })}</p>
+              <p className="font-semibold">
+                {new Date(user.created_at).toLocaleDateString("en-NG", {
+                  dateStyle: "medium",
+                })}
+              </p>
             </div>
           </div>
         </CardContent>
@@ -152,9 +158,19 @@ function MePage() {
               </div>
             ) : null}
           </div>
-          {!user.email_verified ? <p className="rounded-md bg-amber-50 p-3 text-sm text-amber-800">Verify email to change avatar — updates are blocked until verified.</p> : null}
+          {!user.email_verified ? (
+            <p className="rounded-md bg-amber-50 p-3 text-sm text-amber-800">
+              Verify email to change avatar — updates are blocked until verified.
+            </p>
+          ) : null}
           <Label htmlFor="avatar">Avatar URL</Label>
-          <Input id="avatar" placeholder="https://..." value={url} onChange={(e) => setUrl(e.target.value)} disabled={!user.email_verified} />
+          <Input
+            id="avatar"
+            placeholder="https://..."
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            disabled={!user.email_verified}
+          />
           {msg ? <p className="text-sm text-emerald-600">{msg}</p> : null}
           {err ? <p className="text-sm text-destructive">{err}</p> : null}
           <Button onClick={() => mutate.mutate(url)} disabled={mutate.isPending || uploading || !user.email_verified}>
@@ -163,5 +179,5 @@ function MePage() {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

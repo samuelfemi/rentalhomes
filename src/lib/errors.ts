@@ -3,5 +3,5 @@
  * Only Error instances carry a message contract; anything else falls back.
  */
 export function errorMessage(cause: unknown, fallback = "Request failed"): string {
-  return cause instanceof Error ? cause.message : fallback;
+  return cause instanceof Error ? cause.message : fallback
 }

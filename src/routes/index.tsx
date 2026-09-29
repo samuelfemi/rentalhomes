@@ -1,26 +1,26 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { listingsApi, type ListingFilters } from "#/lib/api";
-import { errorMessage } from "#/lib/errors";
-import { ListingCard, ListingSkeleton } from "#/components/listing/card";
-import { ListingFilters as Filters, type FilterValues } from "#/components/listing/filters";
-import { Button } from "#/components/ui/button";
-import { ArrowRight, Building2, ShieldCheck, Search, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
-import * as React from "react";
+import { useQuery } from "@tanstack/react-query"
+import { createFileRoute, Link } from "@tanstack/react-router"
+import { ArrowRight, Building2, ChevronLeft, ChevronRight, MapPin, Search, ShieldCheck } from "lucide-react"
+import * as React from "react"
+import { ListingCard, ListingSkeleton } from "#/components/listing/card"
+import { ListingFilters as Filters, type FilterValues } from "#/components/listing/filters"
+import { Button } from "#/components/ui/button"
+import { type ListingFilters, listingsApi } from "#/lib/api"
+import { errorMessage } from "#/lib/errors"
 
-export const Route = createFileRoute("/")({ component: Home });
+export const Route = createFileRoute("/")({ component: Home })
 
 function useDebounced<T>(value: T, ms = 350) {
-  const [v, setV] = React.useState(value);
+  const [v, setV] = React.useState(value)
   React.useEffect(() => {
-    const id = setTimeout(() => setV(value), ms);
-    return () => clearTimeout(id);
-  }, [value, ms]);
-  return v;
+    const id = setTimeout(() => setV(value), ms)
+    return () => clearTimeout(id)
+  }, [value, ms])
+  return v
 }
 
 function Home() {
-  const [page, setPage] = React.useState(1);
+  const [page, setPage] = React.useState(1)
   const [filters, setFilters] = React.useState<FilterValues>({
     search: "",
     status: "",
@@ -29,9 +29,9 @@ function Home() {
     maxPrice: "",
     rooms: "",
     minRooms: "",
-  });
+  })
 
-  const debouncedSearch = useDebounced(filters.search, 400);
+  const debouncedSearch = useDebounced(filters.search, 400)
 
   const apiFilters: ListingFilters = React.useMemo(
     () => ({
@@ -45,20 +45,29 @@ function Home() {
       rooms: filters.rooms ? Number(filters.rooms) : undefined,
       minRooms: filters.minRooms ? Number(filters.minRooms) : undefined,
     }),
-    [page, debouncedSearch, filters.status, filters.furnished, filters.minPrice, filters.maxPrice, filters.rooms, filters.minRooms],
-  );
+    [
+      page,
+      debouncedSearch,
+      filters.status,
+      filters.furnished,
+      filters.minPrice,
+      filters.maxPrice,
+      filters.rooms,
+      filters.minRooms,
+    ],
+  )
 
   const { data, isLoading, isError, error, isFetching } = useQuery({
     queryKey: ["listings", apiFilters],
     queryFn: () => listingsApi.list(apiFilters),
     placeholderData: (prev) => prev,
-  });
+  })
 
   // reset page when filters change
-  const filtersKey = `${debouncedSearch}|${filters.status}|${filters.furnished}|${filters.minPrice}|${filters.maxPrice}|${filters.rooms}|${filters.minRooms}`;
+  const filtersKey = `${debouncedSearch}|${filters.status}|${filters.furnished}|${filters.minPrice}|${filters.maxPrice}|${filters.rooms}|${filters.minRooms}`
   React.useEffect(() => {
-    setPage(1);
-  }, [filtersKey]);
+    setPage(1)
+  }, [filtersKey])
 
   return (
     <div className="mx-auto w-full max-w-[1280px] px-4 py-6 sm:px-6 sm:py-8">
@@ -77,7 +86,8 @@ function Home() {
               <span className="text-primary"> like home.</span>
             </h1>
             <p className="max-w-[52ch] text-[15px] leading-relaxed text-muted-foreground">
-              EazyRent connects you with trusted landlords. Search by neighborhood, price, and preferences — save what you love and message directly.
+              EazyRent connects you with trusted landlords. Search by neighborhood, price, and preferences — save what
+              you love and message directly.
             </p>
             <div className="flex flex-wrap items-center gap-3 pt-1">
               <Button asChild size="lg" className="gap-1.5">
@@ -136,7 +146,9 @@ function Home() {
                         </p>
                         <p className="text-xs font-bold">₦2,500,000 / year</p>
                       </div>
-                      <span className="h-fit rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">Available</span>
+                      <span className="h-fit rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">
+                        Available
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -152,7 +164,15 @@ function Home() {
           values={filters}
           onChange={(p) => setFilters((s) => ({ ...s, ...p }))}
           onReset={() =>
-            setFilters({ search: "", status: "", furnished: "", minPrice: "", maxPrice: "", rooms: "", minRooms: "" })
+            setFilters({
+              search: "",
+              status: "",
+              furnished: "",
+              minPrice: "",
+              maxPrice: "",
+              rooms: "",
+              minRooms: "",
+            })
           }
           total={data?.total}
         />
@@ -183,8 +203,24 @@ function Home() {
                 <Search className="size-6 text-muted-foreground" />
               </div>
               <h3 className="text-lg font-bold">No homes match your search</h3>
-              <p className="text-sm text-muted-foreground">Try widening your price range, clearing filters, or searching a different area.</p>
-              <Button variant="outline" size="sm" onClick={() => setFilters({ search: "", status: "", furnished: "", minPrice: "", maxPrice: "", rooms: "", minRooms: "" })}>
+              <p className="text-sm text-muted-foreground">
+                Try widening your price range, clearing filters, or searching a different area.
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  setFilters({
+                    search: "",
+                    status: "",
+                    furnished: "",
+                    minPrice: "",
+                    maxPrice: "",
+                    rooms: "",
+                    minRooms: "",
+                  })
+                }
+              >
                 Clear all filters
               </Button>
             </div>
@@ -195,7 +231,8 @@ function Home() {
         {data && data.total_pages > 1 ? (
           <div className="mt-8 flex items-center justify-between gap-3 border-t pt-6">
             <p className="text-sm text-muted-foreground">
-              Page <span className="font-semibold text-foreground">{data.page}</span> of {data.total_pages} • {data.total} homes
+              Page <span className="font-semibold text-foreground">{data.page}</span> of {data.total_pages} •{" "}
+              {data.total} homes
               {isFetching ? <span className="ml-2 text-xs">Updating…</span> : null}
             </p>
             <div className="flex items-center gap-2">
@@ -222,5 +259,5 @@ function Home() {
         ) : null}
       </div>
     </div>
-  );
+  )
 }

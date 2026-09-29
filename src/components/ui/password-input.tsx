@@ -1,10 +1,10 @@
-import * as React from "react";
-import { Eye, EyeOff } from "lucide-react";
-import { Input } from "#/components/ui/input";
-import { cn } from "cn";
+import { cn } from "cn"
+import { Eye, EyeOff } from "lucide-react"
+import * as React from "react"
+import { Input } from "#/components/ui/input"
 
 function PasswordInput({ className, ...props }: Omit<React.ComponentProps<"input">, "type">) {
-  const [visible, setVisible] = React.useState(false);
+  const [visible, setVisible] = React.useState(false)
   return (
     <div className={cn("relative", className)}>
       <Input type={visible ? "text" : "password"} {...props} className="pr-10" />
@@ -18,7 +18,7 @@ function PasswordInput({ className, ...props }: Omit<React.ComponentProps<"input
         {visible ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
       </button>
     </div>
-  );
+  )
 }
 
-export { PasswordInput };
+export { PasswordInput }
