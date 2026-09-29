@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { LocateFixed } from "lucide-react"
+import { LocateFixed, MapPin } from "lucide-react"
 import * as React from "react"
 import { LAGOS_CENTER, MapPicker } from "#/components/listing/map-picker"
 import { PhotoInput } from "#/components/listing/photo-input"
@@ -11,10 +11,14 @@ import { Label } from "#/components/ui/label"
 import { useToast } from "#/components/ui/toast"
 import { listingsApi } from "#/lib/api"
 import { useAuth } from "#/lib/auth"
+import { errorMessage } from "#/lib/errors"
+import { geocodeAddress } from "#/lib/geocode"
 
 export const Route = createFileRoute("/listings/new")({
   component: NewListing,
 })
+
+type Coords = { lat: number; lng: number }
 
 function NewListing() {
   const { isAuthenticated, isLoading, user } = useAuth()
@@ -30,7 +34,7 @@ function NewListing() {
     furnished: "false",
     address: "",
   })
-  const [coords, setCoords] = React.useState({
+  const [coords, setCoords] = React.useState<Coords>({
     lat: LAGOS_CENTER.lat,
     lng: LAGOS_CENTER.lng,
   })
@@ -38,6 +42,12 @@ function NewListing() {
   const [error, setError] = React.useState<string | null>(null)
   const [phase, setPhase] = React.useState<"idle" | "publishing" | "photos">("idle")
   const [locating, setLocating] = React.useState(false)
+  const [geocoding, setGeocoding] = React.useState(false)
+  const [geoNote, setGeoNote] = React.useState<string | null>(null)
+  const [geoError, setGeoError] = React.useState<string | null>(null)
+  // Tracks the address the current pin came from, so auto-geocoding does not
+  // fight a pin the user dragged by hand.
+  const pinnedFromRef = React.useRef<string>("")
 
   const create = useMutation({
     mutationFn: async () => {
@@ -80,6 +90,49 @@ function NewListing() {
       setError(e.message)
     },
   })
+
+  const applyCoords = React.useCallback((next: Coords, from: string) => {
+    setCoords(next)
+    pinnedFromRef.current = from
+  }, [])
+
+  // Geocode the typed address and move the pin. Runs on an explicit button
+  // press and automatically once the address stops changing, so the pin
+  // tracks what the landlord typed without them hunting for it by hand.
+  const lookupAddress = React.useCallback(
+    async (address: string, { silent }: { silent: boolean }) => {
+      const q = address.trim()
+      if (q.length < 4) return
+      setGeocoding(true)
+      setGeoError(null)
+      try {
+        const hit = await geocodeAddress(q)
+        applyCoords({ lat: hit.lat, lng: hit.lng }, q)
+        setGeoNote(`${hit.lat.toFixed(5)}, ${hit.lng.toFixed(5)}`)
+        if (!silent) {
+          toast("Pin moved to your address", { description: hit.label })
+        }
+      } catch (e) {
+        setGeoNote(null)
+        setGeoError(errorMessage(e, "Could not look up that address"))
+      } finally {
+        setGeocoding(false)
+      }
+    },
+    [applyCoords, toast],
+  )
+
+  // Debounced auto-geocode. Nominatim allows ~1 request/second, so wait for
+  // the address to settle and skip if the pin no longer matches the text.
+  React.useEffect(() => {
+    const q = form.address.trim()
+    if (q.length < 4) return
+    if (q === pinnedFromRef.current) return
+    const id = window.setTimeout(() => {
+      void lookupAddress(q, { silent: true })
+    }, 900)
+    return () => window.clearTimeout(id)
+  }, [form.address, lookupAddress])
 
   if (isLoading) return <div className="mx-auto max-w-[720px] px-4 py-10 sm:px-6">Loading…</div>
   if (!isAuthenticated) {
@@ -132,7 +185,11 @@ function NewListing() {
     setLocating(true)
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+        // Manual placement wins: record the current text so the debounced
+        // geocoder does not snap the pin back to the address.
+        applyCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }, form.address.trim())
+        setGeoNote(null)
+        setGeoError(null)
         setLocating(false)
         toast("Location set", {
           description: "Pin moved to your current position.",
@@ -228,9 +285,29 @@ function NewListing() {
                   id="address"
                   required
                   value={form.address}
-                  onChange={(e) => setForm({ ...form, address: e.target.value })}
+                  onChange={(e) => {
+                    setForm({ ...form, address: e.target.value })
+                    setGeoError(null)
+                  }}
                   placeholder="12 Herbert Macaulay Way, Yaba"
                 />
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-xs text-muted-foreground">
+                    {geoError ??
+                      (geocoding ? "Looking up address…" : "We place the pin from your address automatically.")}
+                  </p>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="xs"
+                    className="gap-1 shrink-0"
+                    onClick={() => void lookupAddress(form.address, { silent: false })}
+                    disabled={geocoding || form.address.trim().length < 4}
+                  >
+                    <MapPin className="size-3.5" />
+                    {geocoding ? "Locating…" : "Use address"}
+                  </Button>
+                </div>
               </div>
             </div>
 
@@ -249,7 +326,19 @@ function NewListing() {
                   {locating ? "Locating…" : "Use my location"}
                 </Button>
               </div>
-              <MapPicker lat={coords.lat} lng={coords.lng} onChange={setCoords} />
+              <MapPicker
+                lat={coords.lat}
+                lng={coords.lng}
+                onChange={(pos) => {
+                  applyCoords(pos, form.address.trim())
+                  setGeoNote(null)
+                }}
+              />
+              {geoNote ? (
+                <p className="text-xs text-muted-foreground">
+                  Pin set from address: <span className="font-mono">{geoNote}</span>
+                </p>
+              ) : null}
             </div>
 
             <div className="space-y-2">

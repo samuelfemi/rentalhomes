@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import { MapPin } from "lucide-react"
 import * as React from "react"
 import { PhotoInput } from "#/components/listing/photo-input"
 import { Button } from "#/components/ui/button"
@@ -8,6 +9,8 @@ import { Input } from "#/components/ui/input"
 import { Label } from "#/components/ui/label"
 import { useToast } from "#/components/ui/toast"
 import { listingsApi } from "#/lib/api"
+import { errorMessage } from "#/lib/errors"
+import { geocodeAddress } from "#/lib/geocode"
 
 export const Route = createFileRoute("/listings/$id/edit")({
   component: EditPage,
@@ -34,6 +37,10 @@ function EditPage() {
   const [newPhotos, setNewPhotos] = React.useState<string[]>([])
   const [msg, setMsg] = React.useState<string | null>(null)
   const [err, setErr] = React.useState<string | null>(null)
+  // Set only when the landlord asks to re-resolve the address, so a plain
+  // address typo fix never silently moves the pin.
+  const [geo, setGeo] = React.useState<{ lat: number; lng: number; label: string } | null>(null)
+  const [geocoding, setGeocoding] = React.useState(false)
 
   React.useEffect(() => {
     if (data?.listing) {
@@ -56,14 +63,30 @@ function EditPage() {
         price: form.price,
         rooms: Number(form.rooms),
         address: form.address,
+        ...(geo ? { latitude: geo.lat, longitude: geo.lng } : {}),
       }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["listing", id] })
-      setMsg("Saved")
+      setMsg(geo ? "Saved, location updated" : "Saved")
       setErr(null)
+      setGeo(null)
     },
     onError: (e: Error) => setErr(e.message),
   })
+
+  const resolveAddress = async () => {
+    setGeocoding(true)
+    setErr(null)
+    try {
+      const hit = await geocodeAddress(form.address)
+      setGeo(hit)
+      toast("Location resolved", { description: `${hit.lat.toFixed(5)}, ${hit.lng.toFixed(5)}` })
+    } catch (e) {
+      setErr(errorMessage(e, "Could not look up that address"))
+    } finally {
+      setGeocoding(false)
+    }
+  }
 
   const updateStatus = useMutation({
     mutationFn: () => listingsApi.updateStatus(id, status),
@@ -125,7 +148,32 @@ function EditPage() {
             </div>
           </div>
           <Label>Address</Label>
-          <Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+          <Input
+            value={form.address}
+            onChange={(e) => {
+              setForm({ ...form, address: e.target.value })
+              setGeo(null)
+            }}
+          />
+          <div className="mt-1.5 flex items-center justify-between gap-2">
+            <p className="text-xs text-muted-foreground">
+              {geo
+                ? `Location will move to ${geo.lat.toFixed(5)}, ${geo.lng.toFixed(5)}`
+                : data?.listing
+                  ? `Current: ${data.listing.latitude.toFixed(5)}, ${data.listing.longitude.toFixed(5)}`
+                  : ""}
+            </p>
+            <Button
+              variant="ghost"
+              size="xs"
+              className="gap-1 shrink-0"
+              onClick={() => void resolveAddress()}
+              disabled={geocoding || form.address.trim().length < 4 || update.isPending}
+            >
+              <MapPin className="size-3.5" />
+              {geocoding ? "Locating…" : "Use address"}
+            </Button>
+          </div>
           {err ? <p className="text-sm text-destructive">{err}</p> : null}
           {msg ? <p className="text-sm text-emerald-600">{msg}</p> : null}
           <div className="flex gap-2">
