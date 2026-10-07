@@ -21,12 +21,12 @@ function FavoritesPage() {
     enabled: isAuthenticated && isVerified,
   })
 
-  if (authLoading) return <div className="mx-auto max-w-[1280px] px-4 py-10 sm:px-6">Loading…</div>
+  if (authLoading) return <div className="mx-auto max-w-320 px-4 py-10 sm:px-6">Loading…</div>
 
   if (isAuthenticated && !isVerified) {
     return (
-      <div className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6">
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-10 text-center">
+      <div className="mx-auto max-w-320 px-4 py-16 sm:px-6">
+        <div className="rounded-2xl border border-warning-200 bg-warning-50 p-10 text-center">
           <h1 className="text-xl font-bold">Verify your email to use favorites</h1>
           <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
             You can browse listings now. Verify your email (check inbox or API logs for the link) to save favorites.
@@ -42,7 +42,7 @@ function FavoritesPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6">
+      <div className="mx-auto max-w-320 px-4 py-16 sm:px-6">
         <div className="rounded-2xl border bg-white p-10 text-center">
           <Heart className="mx-auto size-10 text-muted-foreground" />
           <h1 className="mt-3 text-xl font-bold">Sign in to see favorites</h1>
@@ -58,7 +58,7 @@ function FavoritesPage() {
   }
 
   return (
-    <div className="mx-auto max-w-[1280px] px-4 py-6 sm:px-6">
+    <div className="mx-auto max-w-320 px-4 py-6 sm:px-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-extrabold">Favorites</h1>
         {data ? <span className="text-sm text-muted-foreground">{data.total} saved</span> : null}

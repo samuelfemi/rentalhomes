@@ -40,6 +40,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.4.5",
     "@oxlint/plugins": "^1.83.0",
+    "@shadcn/lint": "^0.2.0",
     "@tanstack/devtools-vite": "latest",
     "@tanstack/eslint-plugin-query": "^5.102.8",
     "@tanstack/router-cli": "^1.132.0",

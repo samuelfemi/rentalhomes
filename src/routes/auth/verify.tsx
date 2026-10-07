@@ -34,23 +34,25 @@ function Verify() {
   }, [])
 
   return (
-    <div className="mx-auto max-w-[480px] px-4 py-16 sm:px-6">
+    <div className="mx-auto max-w-120 px-4 py-16 sm:px-6">
       <Card>
         <CardHeader>
           <CardTitle>Email verification</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          {state === "loading" ? <p className="text-sm text-muted-foreground">Verifying…</p> : null}
-          {state === "ok" ? <p className="rounded-md bg-emerald-50 p-3 text-sm text-emerald-700">{msg}</p> : null}
-          {state === "error" ? (
-            <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{msg}</p>
-          ) : null}
-          {state === "idle" ? (
-            <p className="text-sm text-muted-foreground">No token in URL. Check your email or API logs.</p>
-          ) : null}
-          <Button asChild>
-            <Link to="/auth/signin">Go to sign in</Link>
-          </Button>
+        <CardContent>
+          <div className="space-y-3">
+            {state === "loading" ? <p className="text-sm text-muted-foreground">Verifying…</p> : null}
+            {state === "ok" ? <p className="rounded-md bg-success-50 p-3 text-sm text-success-700">{msg}</p> : null}
+            {state === "error" ? (
+              <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{msg}</p>
+            ) : null}
+            {state === "idle" ? (
+              <p className="text-sm text-muted-foreground">No token in URL. Check your email or API logs.</p>
+            ) : null}
+            <Button asChild>
+              <Link to="/auth/signin">Go to sign in</Link>
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

@@ -4,7 +4,7 @@ import { ArrowLeft, BedDouble, Heart, MapPin, Pencil, Phone, Sofa, Trash2 } from
 import * as React from "react"
 import { Badge } from "#/components/ui/badge"
 import { Button } from "#/components/ui/button"
-import { Card, CardContent } from "#/components/ui/card"
+import { Card } from "#/components/ui/card"
 import { Dialog, DialogDescription, DialogFooter, DialogPopup, DialogTitle } from "#/components/ui/dialog"
 import { useToast } from "#/components/ui/toast"
 import { favoritesApi, formatPrice, type ListingStatus, listingsApi } from "#/lib/api"
@@ -70,14 +70,14 @@ function DetailPage() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-[1100px] px-4 py-8 sm:px-6">
-        <div className="h-[420px] animate-pulse rounded-2xl bg-muted" />
+      <div className="mx-auto max-w-275 px-4 py-8 sm:px-6">
+        <div className="h-105 animate-pulse rounded-2xl bg-muted" />
       </div>
     )
   }
   if (isError || !data) {
     return (
-      <div className="mx-auto max-w-[1100px] px-4 py-16 sm:px-6">
+      <div className="mx-auto max-w-275 px-4 py-16 sm:px-6">
         <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-8">
           <p className="font-semibold text-destructive">Listing not found</p>
           <p className="text-sm text-muted-foreground">
@@ -103,15 +103,15 @@ function DetailPage() {
   const favErrorMessage = errorMessage(favAdd.error ?? favRemove.error)
 
   return (
-    <div className="mx-auto max-w-[1100px] px-4 py-6 sm:px-6 sm:py-8">
+    <div className="mx-auto max-w-275 px-4 py-6 sm:px-6 sm:py-8">
       <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-medium hover:underline">
         <ArrowLeft className="size-4" /> Back to listings
       </Link>
 
-      <div className="mt-4 grid gap-6 lg:grid-cols-[1.7fr_1fr]">
+      <div className="mt-4 grid gap-6 lg:grid-cols-detail">
         {/* Media */}
         <div className="overflow-hidden rounded-2xl border bg-white">
-          <div className="relative aspect-[16/10] bg-muted">
+          <div className="relative aspect-16/10 bg-muted">
             {cover ? (
               <img src={cover} alt={listing.title} className="h-full w-full object-cover" />
             ) : (
@@ -120,10 +120,12 @@ function DetailPage() {
               </div>
             )}
             <div className="absolute left-3 top-3 flex gap-2">
-              <Badge variant={listing.status === "avaiable" ? "success" : "secondary"} className="shadow">
-                {statusMap[listing.status] ?? listing.status}
-              </Badge>
-              {listing.furnished ? <Badge className="bg-white text-foreground shadow">Furnished</Badge> : null}
+              <span className="rounded-full shadow">
+                <Badge variant={listing.status === "avaiable" ? "success" : "secondary"}>
+                  {statusMap[listing.status] ?? listing.status}
+                </Badge>
+              </span>
+              {listing.furnished ? <Badge variant="overlay">Furnished</Badge> : null}
             </div>
           </div>
           {media.length > 1 ? (
@@ -150,7 +152,7 @@ function DetailPage() {
         {/* Info */}
         <div className="flex flex-col gap-4">
           <Card>
-            <CardContent className="p-6">
+            <div className="p-6">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h1 className="text-2xl font-extrabold leading-tight">{listing.title}</h1>
@@ -205,7 +207,7 @@ function DetailPage() {
                   </Button>
                   <Button
                     variant="destructive"
-                    className="flex-1 gap-1"
+                    className="flex-1"
                     onClick={() => setConfirmDelete(true)}
                     disabled={del.isPending}
                   >
@@ -231,11 +233,11 @@ function DetailPage() {
               ) : null}
 
               {isAuthenticated && !isVerified ? (
-                <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-amber-700">
+                <div className="mt-4 rounded-xl border border-warning-200 bg-warning-50 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-warning-700">
                     Landlord contact locked
                   </p>
-                  <p className="mt-1 text-sm text-amber-900">Verify your email to see landlord phone and name.</p>
+                  <p className="mt-1 text-sm text-warning-900">Verify your email to see landlord phone and name.</p>
                   <Link to="/auth/verify" className="text-sm font-semibold text-primary hover:underline">
                     Verify email
                   </Link>
@@ -289,17 +291,17 @@ function DetailPage() {
                   Unsave
                 </Button>
                 {(favAdd.isSuccess || favRemove.isSuccess) && (
-                  <span className="text-xs text-emerald-600 self-center">Updated</span>
+                  <span className="text-xs text-success-600 self-center">Updated</span>
                 )}
                 {(favAdd.isError || favRemove.isError) && (
                   <span className="text-xs text-destructive self-center">{favErrorMessage}</span>
                 )}
               </div>
-            </CardContent>
+            </div>
           </Card>
 
           <Card>
-            <CardContent className="p-6">
+            <div className="p-6">
               <h2 className="font-bold">About this home</h2>
               <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
                 {listing.description}
@@ -331,7 +333,7 @@ function DetailPage() {
                   </p>
                 </div>
               </div>
-            </CardContent>
+            </div>
           </Card>
         </div>
       </div>

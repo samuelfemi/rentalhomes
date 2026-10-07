@@ -60,56 +60,60 @@ function MePage() {
     }
   }
 
-  if (isLoading) return <div className="mx-auto max-w-[720px] px-4 py-10 sm:px-6">Loading…</div>
+  if (isLoading) return <div className="mx-auto max-w-180 px-4 py-10 sm:px-6">Loading…</div>
   if (!isAuthenticated || !user) {
     return (
-      <div className="mx-auto max-w-[720px] px-4 py-16 sm:px-6">
+      <div className="mx-auto max-w-180 px-4 py-16 sm:px-6">
         <Card>
-          <CardContent className="p-8 text-center">
+          <div className="p-8 text-center">
             <p className="font-semibold">Sign in to view your profile</p>
             <a href="/auth/signin" className="text-sm font-semibold text-primary hover:underline">
               Go to sign in
             </a>
-          </CardContent>
+          </div>
         </Card>
       </div>
     )
   }
 
   return (
-    <div className="mx-auto max-w-[720px] px-4 py-6 sm:px-6">
+    <div className="mx-auto max-w-180 px-4 py-6 sm:px-6">
       <h1 className="text-2xl font-extrabold">Profile</h1>
       <p className="text-sm text-muted-foreground">Manage your account and avatar</p>
 
       <Card className="mt-6">
         <CardHeader>
-          <CardTitle className="flex items-center gap-3">
-            {user.avatar_url ? (
-              <img src={user.avatar_url} alt="" className="size-10 rounded-full object-cover" />
-            ) : (
-              <span className="flex size-10 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
-                {user.full_name[0]?.toUpperCase()}
-              </span>
-            )}
-            {user.full_name}
+          <CardTitle>
+            <span className="flex items-center gap-3">
+              {user.avatar_url ? (
+                <img src={user.avatar_url} alt="" className="size-10 rounded-full object-cover" />
+              ) : (
+                <span className="flex size-10 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+                  {user.full_name[0]?.toUpperCase()}
+                </span>
+              )}
+              {user.full_name}
+            </span>
           </CardTitle>
           <CardDescription>
             {user.email} • {user.phone}
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3 text-sm">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-lg border p-3">
-              <p className="text-xs text-muted-foreground">Email verified</p>
-              <p className="font-semibold">{user.email_verified ? "Yes" : "No — check inbox for verification link"}</p>
-            </div>
-            <div className="rounded-lg border p-3">
-              <p className="text-xs text-muted-foreground">Member since</p>
-              <p className="font-semibold">
-                {new Date(user.created_at).toLocaleDateString("en-NG", {
-                  dateStyle: "medium",
-                })}
-              </p>
+        <CardContent>
+          <div className="space-y-3 text-sm">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-lg border p-3">
+                <p className="text-xs text-muted-foreground">Email verified</p>
+                <p className="font-semibold">{user.email_verified ? "Yes" : "No — check inbox for verification link"}</p>
+              </div>
+              <div className="rounded-lg border p-3">
+                <p className="text-xs text-muted-foreground">Member since</p>
+                <p className="font-semibold">
+                  {new Date(user.created_at).toLocaleDateString("en-NG", {
+                    dateStyle: "medium",
+                  })}
+                </p>
+              </div>
             </div>
           </div>
         </CardContent>
@@ -120,8 +124,9 @@ function MePage() {
           <CardTitle>Avatar</CardTitle>
           <CardDescription>Upload a photo or paste an image link. Leave empty to clear.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex items-center gap-4">
+        <CardContent>
+          <div className="space-y-3">
+            <div className="flex items-center gap-4">
             {url ? (
               <img src={url} alt="Avatar preview" className="size-16 rounded-full border object-cover" />
             ) : (
@@ -141,7 +146,6 @@ function MePage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="gap-1.5"
                   disabled={uploading || mutate.isPending || !user.email_verified}
                   onClick={() => fileRef.current?.click()}
                 >
@@ -159,7 +163,7 @@ function MePage() {
             ) : null}
           </div>
           {!user.email_verified ? (
-            <p className="rounded-md bg-amber-50 p-3 text-sm text-amber-800">
+            <p className="rounded-md bg-warning-50 p-3 text-sm text-warning-800">
               Verify email to change avatar — updates are blocked until verified.
             </p>
           ) : null}
@@ -171,11 +175,12 @@ function MePage() {
             onChange={(e) => setUrl(e.target.value)}
             disabled={!user.email_verified}
           />
-          {msg ? <p className="text-sm text-emerald-600">{msg}</p> : null}
+          {msg ? <p className="text-sm text-success-600">{msg}</p> : null}
           {err ? <p className="text-sm text-destructive">{err}</p> : null}
           <Button onClick={() => mutate.mutate(url)} disabled={mutate.isPending || uploading || !user.email_verified}>
             {mutate.isPending ? "Saving…" : "Save avatar"}
           </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

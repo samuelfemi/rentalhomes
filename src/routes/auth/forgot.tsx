@@ -31,7 +31,7 @@ function Forgot() {
   }
 
   return (
-    <div className="mx-auto max-w-[440px] px-4 py-16 sm:px-6">
+    <div className="mx-auto max-w-110 px-4 py-16 sm:px-6">
       <Card>
         <CardHeader>
           <CardTitle>Forgot password</CardTitle>
@@ -47,7 +47,7 @@ function Forgot() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
             />
-            {msg ? <p className="rounded-md bg-emerald-50 p-3 text-sm text-emerald-700">{msg}</p> : null}
+            {msg ? <p className="rounded-md bg-success-50 p-3 text-sm text-success-700">{msg}</p> : null}
             {err ? <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{err}</p> : null}
             <Button type="submit" disabled={loading} className="w-full">
               {loading ? "Sending…" : "Send reset link"}

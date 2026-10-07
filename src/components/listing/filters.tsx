@@ -39,14 +39,14 @@ export function ListingFilters({
               placeholder="Search by title, address or description…"
               value={values.search}
               onChange={(e) => onChange({ search: e.target.value })}
-              className="pl-9"
+              hasStartIcon
             />
           </div>
           <div className="flex gap-2">
             <Select
               value={values.status}
               onChange={(e) => onChange({ status: e.target.value })}
-              className="min-w-[150px]"
+              className="min-w-37.5"
             >
               <option value="">Any status</option>
               <option value="avaiable">Available</option>
@@ -58,7 +58,7 @@ export function ListingFilters({
               size="default"
               onClick={() => setShowAdvanced((v) => !v)}
               aria-expanded={showAdvanced}
-              className="shrink-0 gap-1.5"
+              className="shrink-0"
             >
               <SlidersHorizontal className="size-4" />
               Filters
@@ -102,7 +102,7 @@ export function ListingFilters({
             />
             <div className="col-span-2 flex items-center gap-2 sm:col-span-3">
               {hasActive ? (
-                <Button variant="ghost" size="sm" onClick={onReset} className="gap-1">
+                <Button variant="ghost" size="sm" onClick={onReset}>
                   <X className="size-3.5" /> Clear filters
                 </Button>
               ) : null}
@@ -114,7 +114,7 @@ export function ListingFilters({
         ) : (
           <div className="flex items-center gap-2">
             {hasActive ? (
-              <Button variant="ghost" size="xs" onClick={onReset} className="gap-1">
+              <Button variant="ghost" size="xs" onClick={onReset}>
                 <X className="size-3" /> Clear
               </Button>
             ) : null}

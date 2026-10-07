@@ -18,11 +18,11 @@ function MyListings() {
     enabled: isAuthenticated && isVerified,
   })
 
-  if (authLoading) return <div className="mx-auto max-w-[1280px] px-4 py-10 sm:px-6">Loading…</div>
+  if (authLoading) return <div className="mx-auto max-w-320 px-4 py-10 sm:px-6">Loading…</div>
   if (isAuthenticated && !isVerified) {
     return (
-      <div className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6">
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-10 text-center">
+      <div className="mx-auto max-w-320 px-4 py-16 sm:px-6">
+        <div className="rounded-2xl border border-warning-200 bg-warning-50 p-10 text-center">
           <h1 className="text-xl font-bold">Verify your email to manage listings</h1>
           <p className="text-sm text-muted-foreground">
             You can browse homes. Verify to create and track your listings.
@@ -37,7 +37,7 @@ function MyListings() {
   }
   if (!isAuthenticated) {
     return (
-      <div className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6">
+      <div className="mx-auto max-w-320 px-4 py-16 sm:px-6">
         <div className="rounded-2xl border bg-white p-10 text-center">
           <h1 className="text-xl font-bold">Sign in to manage listings</h1>
           <p className="text-sm text-muted-foreground">Landlords can create, edit and track their homes.</p>
@@ -50,7 +50,7 @@ function MyListings() {
   }
 
   return (
-    <div className="mx-auto max-w-[1280px] px-4 py-6 sm:px-6">
+    <div className="mx-auto max-w-320 px-4 py-6 sm:px-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-extrabold">My listings</h1>

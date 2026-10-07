@@ -91,7 +91,7 @@ export function MapPicker({
 
   if (failed) {
     return (
-      <div className="flex h-[320px] items-center justify-center rounded-xl border bg-muted p-6 text-center text-sm text-muted-foreground">
+      <div className="flex h-80 items-center justify-center rounded-xl border bg-muted p-6 text-center text-sm text-muted-foreground">
         Map failed to load. You can still publish — coordinates default to Lagos.
       </div>
     )
@@ -99,7 +99,7 @@ export function MapPicker({
 
   return (
     <div className="overflow-hidden rounded-xl border">
-      <div ref={containerRef} className="h-[320px] w-full bg-muted" aria-label="Property location map" />
+      <div ref={containerRef} className="h-80 w-full bg-muted" aria-label="Property location map" />
       <p className="border-t bg-white px-3 py-2 text-xs text-muted-foreground">
         Click the map to drop the pin, or drag it. {lat.toFixed(5)}, {lng.toFixed(5)}
       </p>

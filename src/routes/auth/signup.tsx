@@ -47,10 +47,10 @@ function SignUp() {
   }
 
   return (
-    <div className="mx-auto flex min-h-[calc(100vh-240px)] max-w-[480px] items-center px-4 py-10 sm:px-6">
+    <div className="mx-auto flex min-h-auth max-w-120 items-center px-4 py-10 sm:px-6">
       <Card className="w-full">
         <CardHeader>
-          <CardTitle className="text-2xl">Create account</CardTitle>
+          <CardTitle size="xl">Create account</CardTitle>
           <CardDescription>Join EazyRent — list or find your next home</CardDescription>
         </CardHeader>
         <CardContent>
@@ -93,7 +93,7 @@ function SignUp() {
               />
             </div>
             {error ? <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</p> : null}
-            {info ? <p className="rounded-md bg-emerald-50 p-3 text-sm text-emerald-700">{info}</p> : null}
+            {info ? <p className="rounded-md bg-success-50 p-3 text-sm text-success-700">{info}</p> : null}
             <Button type="submit" disabled={loading} className="w-full">
               {loading ? "Creating…" : "Create account"}
             </Button>

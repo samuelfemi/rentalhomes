@@ -134,37 +134,37 @@ function NewListing() {
     return () => window.clearTimeout(id)
   }, [form.address, lookupAddress])
 
-  if (isLoading) return <div className="mx-auto max-w-[720px] px-4 py-10 sm:px-6">Loading…</div>
+  if (isLoading) return <div className="mx-auto max-w-180 px-4 py-10 sm:px-6">Loading…</div>
   if (!isAuthenticated) {
     return (
-      <div className="mx-auto max-w-[720px] px-4 py-16 sm:px-6">
+      <div className="mx-auto max-w-180 px-4 py-16 sm:px-6">
         <Card>
-          <CardContent className="p-8 text-center">
+          <div className="p-8 text-center">
             <p className="font-semibold">Sign in to list a home</p>
             <Button asChild className="mt-4">
               <a href="/auth/signin">Sign in</a>
             </Button>
-          </CardContent>
+          </div>
         </Card>
       </div>
     )
   }
   if (!isVerified) {
     return (
-      <div className="mx-auto max-w-[720px] px-4 py-16 sm:px-6">
+      <div className="mx-auto max-w-180 px-4 py-16 sm:px-6">
         <Card>
           <CardHeader>
             <CardTitle>Verify email to list</CardTitle>
             <CardDescription>You can browse listings now. Verify to publish.</CardDescription>
           </CardHeader>
-          <CardContent className="p-8 text-center">
+          <div className="p-8 text-center">
             <p className="text-sm text-muted-foreground">
               Check inbox ({user?.email}) or API logs for the verification link.
             </p>
             <Button asChild className="mt-4">
               <a href="/auth/verify">Go to verification</a>
             </Button>
-          </CardContent>
+          </div>
         </Card>
       </div>
     )
@@ -209,7 +209,7 @@ function NewListing() {
   const busy = phase !== "idle"
 
   return (
-    <div className="mx-auto max-w-[720px] px-4 py-6 sm:px-6">
+    <div className="mx-auto max-w-180 px-4 py-6 sm:px-6">
       <h1 className="text-2xl font-extrabold">List a home</h1>
       <p className="text-sm text-muted-foreground">Details, photos and an exact pin — done in one step.</p>
 
@@ -240,7 +240,7 @@ function NewListing() {
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
                 placeholder="Spacious, well-ventilated with parking and water…"
-                className="min-h-[110px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="min-h-27.5 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -300,7 +300,7 @@ function NewListing() {
                     type="button"
                     variant="ghost"
                     size="xs"
-                    className="gap-1 shrink-0"
+                    className="shrink-0"
                     onClick={() => void lookupAddress(form.address, { silent: false })}
                     disabled={geocoding || form.address.trim().length < 4}
                   >
@@ -320,7 +320,6 @@ function NewListing() {
                   size="xs"
                   onClick={useMyLocation}
                   disabled={locating}
-                  className="gap-1"
                 >
                   <LocateFixed className="size-3.5" />
                   {locating ? "Locating…" : "Use my location"}

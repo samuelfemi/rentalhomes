@@ -38,7 +38,7 @@ function Reset() {
   }
 
   return (
-    <div className="mx-auto max-w-[440px] px-4 py-16 sm:px-6">
+    <div className="mx-auto max-w-110 px-4 py-16 sm:px-6">
       <Card>
         <CardHeader>
           <CardTitle>Reset password</CardTitle>
@@ -55,7 +55,7 @@ function Reset() {
             <Label>New password (min 8)</Label>
             <PasswordInput required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
             {msg ? (
-              <p className="rounded-md bg-emerald-50 p-3 text-sm text-emerald-700">
+              <p className="rounded-md bg-success-50 p-3 text-sm text-success-700">
                 {msg}{" "}
                 <Link to="/auth/signin" className="font-semibold underline">
                   Sign in

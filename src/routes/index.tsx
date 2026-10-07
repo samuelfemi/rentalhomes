@@ -70,27 +70,27 @@ function Home() {
   }, [filtersKey])
 
   return (
-    <div className="mx-auto w-full max-w-[1280px] px-4 py-6 sm:px-6 sm:py-8">
+    <div className="mx-auto w-full max-w-320 px-4 py-6 sm:px-6 sm:py-8">
       {/* Hero */}
-      <div className="relative overflow-hidden rounded-[24px] border bg-white">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-amber-50" />
-        <div className="absolute -right-20 -top-20 size-[320px] rounded-full bg-primary/10 blur-3xl" />
-        <div className="relative grid gap-6 p-6 sm:p-8 lg:grid-cols-[1.1fr_0.9fr] lg:p-10">
+      <div className="relative overflow-hidden rounded-3xl border bg-white">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-warning-50" />
+        <div className="absolute -right-20 -top-20 size-80 rounded-full bg-primary/10 blur-3xl" />
+        <div className="relative grid gap-6 p-6 sm:p-8 lg:grid-cols-hero lg:p-10">
           <div className="flex flex-col gap-4">
             <span className="inline-flex w-fit items-center gap-1.5 rounded-full border bg-white px-3 py-1 text-xs font-semibold">
-              <span className="size-2 rounded-full bg-emerald-500" />
+              <span className="size-2 rounded-full bg-success-500" />
               Verified listings across Nigeria
             </span>
-            <h1 className="text-balance text-[32px] font-extrabold leading-[0.95] tracking-tight sm:text-[44px]">
+            <h1 className="text-balance text-3xl font-extrabold leading-none tracking-tight sm:text-5xl">
               Find a home that feels
               <span className="text-primary"> like home.</span>
             </h1>
-            <p className="max-w-[52ch] text-[15px] leading-relaxed text-muted-foreground">
+            <p className="max-w-104 text-sm leading-relaxed text-muted-foreground">
               EazyRent connects you with trusted landlords. Search by neighborhood, price, and preferences — save what
               you love and message directly.
             </p>
             <div className="flex flex-wrap items-center gap-3 pt-1">
-              <Button asChild size="lg" className="gap-1.5">
+              <Button asChild size="lg">
                 <a href="#listings">
                   Browse homes <ArrowRight className="size-4" />
                 </a>
@@ -101,7 +101,7 @@ function Home() {
             </div>
             <div className="flex flex-wrap gap-6 pt-2 text-sm">
               <span className="inline-flex items-center gap-2 font-medium">
-                <span className="flex size-8 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
+                <span className="flex size-8 items-center justify-center rounded-full bg-success-50 text-success-700">
                   <ShieldCheck className="size-4" />
                 </span>
                 Verified landlords
@@ -125,7 +125,7 @@ function Home() {
                   { k: "Furnished", v: "Filter" },
                 ].map((c) => (
                   <div key={c.k} className="bg-white px-3 py-3 text-center">
-                    <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">{c.k}</p>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{c.k}</p>
                     <p className="text-xs font-bold">{c.v}</p>
                   </div>
                 ))}
@@ -146,7 +146,7 @@ function Home() {
                         </p>
                         <p className="text-xs font-bold">₦2,500,000 / year</p>
                       </div>
-                      <span className="h-fit rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">
+                      <span className="h-fit rounded-full bg-success-100 px-2 py-0.5 text-xs font-semibold text-success-700">
                         Available
                       </span>
                     </div>
@@ -241,7 +241,6 @@ function Home() {
                 size="sm"
                 disabled={page <= 1}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="gap-1"
               >
                 <ChevronLeft className="size-4" /> Prev
               </Button>
@@ -250,7 +249,6 @@ function Home() {
                 size="sm"
                 disabled={page >= data.total_pages}
                 onClick={() => setPage((p) => p + 1)}
-                className="gap-1"
               >
                 Next <ChevronRight className="size-4" />
               </Button>

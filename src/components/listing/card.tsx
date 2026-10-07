@@ -27,12 +27,12 @@ export function ListingCard({ listing }: { listing: Listing }) {
       params={{ id: listing.id }}
       className="group flex flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+      <div className="relative aspect-4/3 overflow-hidden bg-muted">
         {listing.cover_image ? (
           <img
             src={listing.cover_image}
             alt={listing.title}
-            className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-103"
             loading="lazy"
           />
         ) : (
@@ -41,11 +41,11 @@ export function ListingCard({ listing }: { listing: Listing }) {
           </div>
         )}
         <div className="absolute left-3 top-3 flex items-center gap-2">
-          <Badge variant={s.variant} className="shadow">
-            {s.label}
-          </Badge>
+          <span className="rounded-full shadow">
+            <Badge variant={s.variant}>{s.label}</Badge>
+          </span>
           {listing.furnished ? (
-            <Badge variant="secondary" className="gap-1 bg-white/90 text-foreground shadow backdrop-blur">
+            <Badge variant="overlay">
               <Sofa className="size-3" /> Furnished
             </Badge>
           ) : null}
@@ -63,7 +63,7 @@ export function ListingCard({ listing }: { listing: Listing }) {
       </div>
 
       <div className="flex flex-1 flex-col gap-2 p-4">
-        <h3 className="line-clamp-1 text-[15px] font-bold leading-tight">{listing.title}</h3>
+        <h3 className="line-clamp-1 text-base font-bold leading-tight">{listing.title}</h3>
         <p className="flex items-center gap-1 text-xs text-muted-foreground">
           <MapPin className="size-3 shrink-0" />
           <span className="line-clamp-1">{listing.address}</span>
@@ -95,7 +95,7 @@ export function ListingCard({ listing }: { listing: Listing }) {
 export function ListingSkeleton() {
   return (
     <div className="overflow-hidden rounded-2xl border bg-card">
-      <div className="aspect-[4/3] animate-pulse bg-muted" />
+      <div className="aspect-4/3 animate-pulse bg-muted" />
       <div className="space-y-3 p-4">
         <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
         <div className="h-3 w-full animate-pulse rounded bg-muted" />

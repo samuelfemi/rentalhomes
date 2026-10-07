@@ -36,10 +36,10 @@ function SignIn() {
   }
 
   return (
-    <div className="mx-auto flex min-h-[calc(100vh-240px)] max-w-[440px] items-center px-4 py-10 sm:px-6">
+    <div className="mx-auto flex min-h-auth max-w-110 items-center px-4 py-10 sm:px-6">
       <Card className="w-full">
         <CardHeader>
-          <CardTitle className="text-2xl">Welcome back</CardTitle>
+          <CardTitle size="xl">Welcome back</CardTitle>
           <CardDescription>Sign in to save favorites and manage listings</CardDescription>
         </CardHeader>
         <CardContent>

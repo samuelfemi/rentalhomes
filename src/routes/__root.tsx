@@ -27,7 +27,7 @@ export const Route = createRootRoute({
 
 function NotFound() {
   return (
-    <div className="mx-auto max-w-[640px] px-4 py-16 text-center sm:px-6">
+    <div className="mx-auto max-w-160 px-4 py-16 text-center sm:px-6">
       <p className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">404</p>
       <h1 className="mt-2 text-3xl font-extrabold tracking-tight">Page not found</h1>
       <p className="mt-2 text-sm text-muted-foreground">The page you’re looking for doesn’t exist or was moved.</p>
@@ -47,15 +47,15 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body className="min-h-screen bg-[#fcfcf9] text-foreground antialiased">
+      <body className="min-h-screen bg-paper text-foreground antialiased">
         <QueryProvider>
           <AuthProvider>
             <ToastProvider>
               <Header />
               <VerifyBanner />
-              <div className="min-h-[calc(100vh-64px)]">{children ?? <Outlet />}</div>
+              <div className="min-h-main">{children ?? <Outlet />}</div>
               <footer className="border-t bg-white">
-                <div className="mx-auto flex max-w-[1280px] flex-col gap-2 px-4 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                <div className="mx-auto flex max-w-320 flex-col gap-2 px-4 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
                   <span>© {new Date().getFullYear()} EazyRent — Built for the Nigerian market.</span>
                   <span className="flex gap-4">
                     <a

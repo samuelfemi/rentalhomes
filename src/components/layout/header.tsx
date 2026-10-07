@@ -10,14 +10,14 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="mx-auto flex h-[64px] w-full max-w-[1280px] items-center justify-between gap-4 px-4 sm:px-6">
+      <div className="mx-auto flex h-16 w-full max-w-320 items-center justify-between gap-4 px-4 sm:px-6">
         <Link to="/" className="flex items-center gap-2.5">
           <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Building2 className="size-5" />
           </span>
           <span className="flex flex-col leading-none">
-            <span className="text-[17px] font-extrabold tracking-tight">EazyRent</span>
-            <span className="hidden text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground sm:block">
+            <span className="text-lg font-extrabold tracking-tight">EazyRent</span>
+            <span className="hidden text-xs font-semibold uppercase tracking-widest text-muted-foreground sm:block">
               Find home, easily
             </span>
           </span>
@@ -40,7 +40,7 @@ export function Header() {
               </Link>
             </>
           ) : isAuthenticated && !isVerified ? (
-            <span className="rounded-md bg-amber-100 px-3 py-1.5 text-xs font-semibold text-amber-800">
+            <span className="rounded-md bg-warning-100 px-3 py-1.5 text-xs font-semibold text-warning-800">
               Verify email to access favorites & listings
             </span>
           ) : null}
@@ -72,11 +72,11 @@ export function Header() {
                   {user?.avatar_url ? (
                     <img src={user.avatar_url} alt="" className="size-7 rounded-full object-cover" />
                   ) : (
-                    <span className="flex size-7 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">
+                    <span className="flex size-7 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
                       {(user?.full_name?.[0] ?? user?.email?.[0] ?? "U").toUpperCase()}
                     </span>
                   )}
-                  <span className="max-w-[120px] truncate">{user?.full_name ?? user?.email}</span>
+                  <span className="max-w-30 truncate">{user?.full_name ?? user?.email}</span>
                 </Link>
                 <Button
                   variant="ghost"

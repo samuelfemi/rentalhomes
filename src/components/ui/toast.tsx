@@ -48,7 +48,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       {children}
       <div
         aria-live="polite"
-        className="pointer-events-none fixed bottom-4 right-4 z-[100] flex w-[calc(100vw-2rem)] max-w-sm flex-col gap-2"
+        className="pointer-events-none fixed inset-x-4 bottom-4 z-100 ml-auto flex max-w-sm flex-col gap-2 sm:left-auto sm:w-96"
       >
         {toasts.map((t) => (
           <div
@@ -56,13 +56,13 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             role="status"
             className={cn(
               "pointer-events-auto flex items-start gap-3 rounded-xl border bg-white p-4 shadow-lg",
-              t.variant === "success" && "border-emerald-200",
+              t.variant === "success" && "border-success-200",
               t.variant === "error" && "border-destructive/30",
               t.variant === "info" && "border-border",
             )}
           >
             {t.variant === "success" ? (
-              <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-emerald-600" />
+              <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-success-600" />
             ) : t.variant === "error" ? (
               <AlertCircle className="mt-0.5 size-5 shrink-0 text-destructive" />
             ) : (

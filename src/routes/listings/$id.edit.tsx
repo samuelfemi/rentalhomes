@@ -117,10 +117,10 @@ function EditPage() {
     onError: (e: Error) => setErr(e.message),
   })
 
-  if (!data) return <div className="mx-auto max-w-[720px] px-4 py-10">Loading…</div>
+  if (!data) return <div className="mx-auto max-w-180 px-4 py-10">Loading…</div>
 
   return (
-    <div className="mx-auto max-w-[720px] px-4 py-6 sm:px-6">
+    <div className="mx-auto max-w-180 px-4 py-6 sm:px-6">
       <h1 className="text-2xl font-extrabold">Edit listing</h1>
       <p className="text-sm text-muted-foreground">Update details, status and images</p>
 
@@ -128,14 +128,15 @@ function EditPage() {
         <CardHeader>
           <CardTitle>Details</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <Label>Title</Label>
+        <CardContent>
+          <div className="space-y-3">
+            <Label>Title</Label>
           <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
           <Label>Description</Label>
           <textarea
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
-            className="min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+            className="min-h-25 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
           />
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -166,7 +167,7 @@ function EditPage() {
             <Button
               variant="ghost"
               size="xs"
-              className="gap-1 shrink-0"
+              className="shrink-0"
               onClick={() => void resolveAddress()}
               disabled={geocoding || form.address.trim().length < 4 || update.isPending}
             >
@@ -175,7 +176,7 @@ function EditPage() {
             </Button>
           </div>
           {err ? <p className="text-sm text-destructive">{err}</p> : null}
-          {msg ? <p className="text-sm text-emerald-600">{msg}</p> : null}
+          {msg ? <p className="text-sm text-success-600">{msg}</p> : null}
           <div className="flex gap-2">
             <Button onClick={() => update.mutate()} disabled={update.isPending}>
               {update.isPending ? "Saving…" : "Save"}
@@ -184,6 +185,7 @@ function EditPage() {
               Back
             </Button>
           </div>
+          </div>
         </CardContent>
       </Card>
 
@@ -191,8 +193,9 @@ function EditPage() {
         <CardHeader>
           <CardTitle>Status</CardTitle>
         </CardHeader>
-        <CardContent className="flex gap-2">
-          <select
+        <CardContent>
+          <div className="flex gap-2">
+            <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -204,6 +207,7 @@ function EditPage() {
           <Button onClick={() => updateStatus.mutate()} disabled={updateStatus.isPending}>
             Update status
           </Button>
+          </div>
         </CardContent>
       </Card>
 
@@ -211,8 +215,9 @@ function EditPage() {
         <CardHeader>
           <CardTitle>Media</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-3 gap-2">
+        <CardContent>
+          <div className="space-y-3">
+            <div className="grid grid-cols-3 gap-2">
             {data.media.map((m) => (
               <img key={m.id} src={m.url} alt="" className="aspect-square rounded-lg object-cover border" />
             ))}
@@ -228,6 +233,7 @@ function EditPage() {
               {addMedia.isPending ? "Attaching…" : `Attach ${newPhotos.length} photo${newPhotos.length > 1 ? "s" : ""}`}
             </Button>
           ) : null}
+          </div>
         </CardContent>
       </Card>
     </div>

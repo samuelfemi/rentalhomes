@@ -6,6 +6,23 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Named layout primitives for ratios and viewport math that have no
+   spacing-scale equivalent. Keeps calc() and custom fr grids in one place. */
+@utility grid-cols-detail {
+  grid-template-columns: 1.7fr 1fr;
+}
+@utility grid-cols-hero {
+  grid-template-columns: 1.1fr 0.9fr;
+}
+/* Content area below the 4rem site header. */
+@utility min-h-main {
+  min-height: calc(100vh - 4rem);
+}
+/* Auth pages: viewport minus header + footer chrome. */
+@utility min-h-auth {
+  min-height: calc(100vh - 15rem);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -54,6 +71,30 @@ body {
   --color-card: var(--card);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
+  --color-paper: #fcfcf9;
+  --color-secondary-hover: color-mix(in oklch, var(--secondary), var(--foreground) 5%);
+  --color-success-50: var(--color-emerald-50);
+  --color-success-100: var(--color-emerald-100);
+  --color-success-200: var(--color-emerald-200);
+  --color-success-300: var(--color-emerald-300);
+  --color-success-400: var(--color-emerald-400);
+  --color-success-500: var(--color-emerald-500);
+  --color-success-600: var(--color-emerald-600);
+  --color-success-700: var(--color-emerald-700);
+  --color-success-800: var(--color-emerald-800);
+  --color-success-900: var(--color-emerald-900);
+  --color-success-950: var(--color-emerald-950);
+  --color-warning-50: var(--color-amber-50);
+  --color-warning-100: var(--color-amber-100);
+  --color-warning-200: var(--color-amber-200);
+  --color-warning-300: var(--color-amber-300);
+  --color-warning-400: var(--color-amber-400);
+  --color-warning-500: var(--color-amber-500);
+  --color-warning-600: var(--color-amber-600);
+  --color-warning-700: var(--color-amber-700);
+  --color-warning-800: var(--color-amber-800);
+  --color-warning-900: var(--color-amber-900);
+  --color-warning-950: var(--color-amber-950);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);

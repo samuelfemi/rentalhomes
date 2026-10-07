@@ -90,7 +90,7 @@ export function PhotoInput({
           <Button
             type="button"
             variant="outline"
-            className="w-full gap-1.5"
+            className="w-full"
             disabled={uploading > 0}
             onClick={() => fileRef.current?.click()}
           >
@@ -122,7 +122,7 @@ export function PhotoInput({
             >
               <img src={url} alt={`Photo ${i + 1}`} className="h-full w-full object-cover" />
               {i === 0 ? (
-                <span className="absolute left-1.5 top-1.5 rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-bold text-white">
+                <span className="absolute left-1.5 top-1.5 rounded-full bg-black/70 px-2 py-0.5 text-xs font-bold text-white">
                   COVER
                 </span>
               ) : null}
