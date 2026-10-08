@@ -16,11 +16,11 @@
 }
 /* Content area below the 4rem site header. */
 @utility min-h-main {
-  min-height: calc(100vh - 4rem);
+  min-height: calc(100dvh - 4rem);
 }
 /* Auth pages: viewport minus header + footer chrome. */
 @utility min-h-auth {
-  min-height: calc(100vh - 15rem);
+  min-height: calc(100dvh - 15rem);
 }
 
 * {

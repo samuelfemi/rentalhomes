@@ -155,7 +155,7 @@ function DetailPage() {
             <div className="p-6">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h1 className="text-2xl font-extrabold leading-tight">{listing.title}</h1>
+                  <h1 className="text-balance text-2xl font-extrabold leading-tight">{listing.title}</h1>
                   <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
                     <MapPin className="size-4" /> {listing.address}
                   </p>
@@ -193,8 +193,8 @@ function DetailPage() {
               </div>
 
               <div className="mt-6 rounded-xl bg-primary px-5 py-4 text-primary-foreground">
-                <p className="text-xs font-semibold uppercase tracking-widest opacity-80">Price</p>
-                <p className="text-2xl font-extrabold">{formatPrice(listing.price)}</p>
+                <p className="text-xs font-semibold uppercase opacity-80">Price</p>
+                <p className="text-2xl font-extrabold tabular-nums">{formatPrice(listing.price)}</p>
                 <p className="text-xs opacity-80">per year • negotiable with landlord</p>
               </div>
 
@@ -234,17 +234,17 @@ function DetailPage() {
 
               {isAuthenticated && !isVerified ? (
                 <div className="mt-4 rounded-xl border border-warning-200 bg-warning-50 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-warning-700">
+                  <p className="text-xs font-semibold uppercase text-warning-700">
                     Landlord contact locked
                   </p>
-                  <p className="mt-1 text-sm text-warning-900">Verify your email to see landlord phone and name.</p>
+                  <p className="mt-1 text-pretty text-sm text-warning-900">Verify your email to see landlord phone and name.</p>
                   <Link to="/auth/verify" className="text-sm font-semibold text-primary hover:underline">
                     Verify email
                   </Link>
                 </div>
               ) : landlord_name || landlord_phone ? (
                 <div className="mt-4 rounded-xl border bg-muted/40 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Landlord</p>
+                  <p className="text-xs font-semibold uppercase text-muted-foreground">Landlord</p>
                   <p className="mt-1 font-semibold">{landlord_name ?? "Landlord"}</p>
                   {landlord_phone ? (
                     <a
@@ -302,8 +302,8 @@ function DetailPage() {
 
           <Card>
             <div className="p-6">
-              <h2 className="font-bold">About this home</h2>
-              <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+              <h2 className="text-balance font-bold">About this home</h2>
+              <p className="mt-2 whitespace-pre-wrap text-pretty text-sm leading-relaxed text-muted-foreground">
                 {listing.description}
               </p>
               <div className="mt-4 grid grid-cols-2 gap-3 text-sm">

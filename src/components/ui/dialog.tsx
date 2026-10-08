@@ -36,7 +36,7 @@ function DialogPopup({ className, children, ...props }: DialogPrimitive.Popup.Pr
         <DialogPrimitive.Popup
           data-slot="dialog-popup"
           className={cn(
-            "relative w-full max-w-md rounded-2xl border bg-white p-6 shadow-xl transition-all duration-200 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
+            "relative w-full max-w-md rounded-2xl border bg-white p-6 shadow-md transition-[transform,opacity] duration-200 ease-out data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
             className,
           )}
           {...props}
@@ -58,7 +58,7 @@ function DialogTitle({ className, ...props }: DialogPrimitive.Title.Props) {
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn("text-lg font-bold tracking-tight", className)}
+      className={cn("text-balance text-lg font-bold", className)}
       {...props}
     />
   )
@@ -68,7 +68,7 @@ function DialogDescription({ className, ...props }: DialogPrimitive.Description.
   return (
     <DialogPrimitive.Description
       data-slot="dialog-description"
-      className={cn("mt-1 text-sm text-muted-foreground", className)}
+      className={cn("mt-1 text-pretty text-sm text-muted-foreground", className)}
       {...props}
     />
   )

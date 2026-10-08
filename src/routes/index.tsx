@@ -72,20 +72,18 @@ function Home() {
   return (
     <div className="mx-auto w-full max-w-320 px-4 py-6 sm:px-6 sm:py-8">
       {/* Hero */}
-      <div className="relative overflow-hidden rounded-3xl border bg-white">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-warning-50" />
-        <div className="absolute -right-20 -top-20 size-80 rounded-full bg-primary/10 blur-3xl" />
-        <div className="relative grid gap-6 p-6 sm:p-8 lg:grid-cols-hero lg:p-10">
+      <div className="overflow-hidden rounded-3xl border bg-white shadow-sm">
+        <div className="grid gap-6 p-6 sm:p-8 lg:grid-cols-hero lg:p-10">
           <div className="flex flex-col gap-4">
             <span className="inline-flex w-fit items-center gap-1.5 rounded-full border bg-white px-3 py-1 text-xs font-semibold">
-              <span className="size-2 rounded-full bg-success-500" />
+              <span className="size-2 rounded-full bg-primary" />
               Verified listings across Nigeria
             </span>
-            <h1 className="text-balance text-3xl font-extrabold leading-none tracking-tight sm:text-5xl">
+            <h1 className="text-balance text-3xl font-extrabold leading-tight sm:text-5xl">
               Find a home that feels
               <span className="text-primary"> like home.</span>
             </h1>
-            <p className="max-w-104 text-sm leading-relaxed text-muted-foreground">
+            <p className="max-w-104 text-pretty text-sm leading-relaxed text-muted-foreground">
               EazyRent connects you with trusted landlords. Search by neighborhood, price, and preferences — save what
               you love and message directly.
             </p>
@@ -101,13 +99,13 @@ function Home() {
             </div>
             <div className="flex flex-wrap gap-6 pt-2 text-sm">
               <span className="inline-flex items-center gap-2 font-medium">
-                <span className="flex size-8 items-center justify-center rounded-full bg-success-50 text-success-700">
+                <span className="flex size-8 items-center justify-center rounded-full bg-muted text-foreground">
                   <ShieldCheck className="size-4" />
                 </span>
                 Verified landlords
               </span>
               <span className="inline-flex items-center gap-2 font-medium">
-                <span className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <span className="flex size-8 items-center justify-center rounded-full bg-muted text-foreground">
                   <Building2 className="size-4" />
                 </span>
                 Direct contact, no middleman
@@ -116,8 +114,7 @@ function Home() {
           </div>
 
           <div className="relative hidden lg:block">
-            <div className="absolute inset-0 -rotate-1 rounded-2xl bg-primary/5" />
-            <div className="relative overflow-hidden rounded-2xl border bg-white shadow-sm">
+            <div className="overflow-hidden rounded-2xl border bg-white shadow-sm">
               <div className="grid grid-cols-3 gap-px bg-border">
                 {[
                   { k: "Available", v: "New" },
@@ -125,7 +122,7 @@ function Home() {
                   { k: "Furnished", v: "Filter" },
                 ].map((c) => (
                   <div key={c.k} className="bg-white px-3 py-3 text-center">
-                    <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{c.k}</p>
+                    <p className="text-xs font-semibold uppercase text-muted-foreground">{c.k}</p>
                     <p className="text-xs font-bold">{c.v}</p>
                   </div>
                 ))}
@@ -144,7 +141,7 @@ function Home() {
                         <p className="flex items-center gap-1 truncate text-xs text-muted-foreground">
                           <MapPin className="size-3" /> Yaba, Lagos
                         </p>
-                        <p className="text-xs font-bold">₦2,500,000 / year</p>
+                        <p className="text-xs font-bold tabular-nums">₦2,500,000 / year</p>
                       </div>
                       <span className="h-fit rounded-full bg-success-100 px-2 py-0.5 text-xs font-semibold text-success-700">
                         Available
@@ -202,8 +199,8 @@ function Home() {
               <div className="flex size-12 items-center justify-center rounded-full bg-muted">
                 <Search className="size-6 text-muted-foreground" />
               </div>
-              <h3 className="text-lg font-bold">No homes match your search</h3>
-              <p className="text-sm text-muted-foreground">
+              <h3 className="text-balance text-lg font-bold">No homes match your search</h3>
+              <p className="text-pretty text-sm text-muted-foreground">
                 Try widening your price range, clearing filters, or searching a different area.
               </p>
               <Button
@@ -230,7 +227,7 @@ function Home() {
         {/* Pagination */}
         {data && data.total_pages > 1 ? (
           <div className="mt-8 flex items-center justify-between gap-3 border-t pt-6">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm tabular-nums text-muted-foreground">
               Page <span className="font-semibold text-foreground">{data.page}</span> of {data.total_pages} •{" "}
               {data.total} homes
               {isFetching ? <span className="ml-2 text-xs">Updating…</span> : null}

@@ -16,8 +16,8 @@ export function Header() {
             <Building2 className="size-5" />
           </span>
           <span className="flex flex-col leading-none">
-            <span className="text-lg font-extrabold tracking-tight">EazyRent</span>
-            <span className="hidden text-xs font-semibold uppercase tracking-widest text-muted-foreground sm:block">
+            <span className="text-lg font-extrabold">EazyRent</span>
+            <span className="hidden text-xs font-semibold uppercase text-muted-foreground sm:block">
               Find home, easily
             </span>
           </span>

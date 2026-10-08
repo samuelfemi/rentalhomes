@@ -8,179 +8,179 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root"
-import { Route as IndexRouteImport } from "./routes/index"
-import { Route as FavoritesRouteImport } from "./routes/favorites"
-import { Route as MeRouteImport } from "./routes/me"
-import { Route as MyListingsRouteImport } from "./routes/my-listings"
-import { Route as ResetPasswordRouteImport } from "./routes/reset-password"
-import { Route as AuthForgotRouteImport } from "./routes/auth/forgot"
-import { Route as AuthResetRouteImport } from "./routes/auth/reset"
-import { Route as AuthSigninRouteImport } from "./routes/auth/signin"
-import { Route as AuthSignupRouteImport } from "./routes/auth/signup"
-import { Route as AuthVerifyRouteImport } from "./routes/auth/verify"
-import { Route as ListingsIdRouteImport } from "./routes/listings/$id"
-import { Route as ListingsNewRouteImport } from "./routes/listings/new"
-import { Route as ListingsIdEditRouteImport } from "./routes/listings/$id.edit"
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as FavoritesRouteImport } from './routes/favorites'
+import { Route as MeRouteImport } from './routes/me'
+import { Route as MyListingsRouteImport } from './routes/my-listings'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthForgotRouteImport } from './routes/auth/forgot'
+import { Route as AuthResetRouteImport } from './routes/auth/reset'
+import { Route as AuthSigninRouteImport } from './routes/auth/signin'
+import { Route as AuthSignupRouteImport } from './routes/auth/signup'
+import { Route as AuthVerifyRouteImport } from './routes/auth/verify'
+import { Route as ListingsIdRouteImport } from './routes/listings/$id'
+import { Route as ListingsNewRouteImport } from './routes/listings/new'
+import { Route as ListingsIdEditRouteImport } from './routes/listings/$id.edit'
 
 const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FavoritesRoute = FavoritesRouteImport.update({
-  id: "/favorites",
-  path: "/favorites",
+  id: '/favorites',
+  path: '/favorites',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MeRoute = MeRouteImport.update({
-  id: "/me",
-  path: "/me",
+  id: '/me',
+  path: '/me',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MyListingsRoute = MyListingsRouteImport.update({
-  id: "/my-listings",
-  path: "/my-listings",
+  id: '/my-listings',
+  path: '/my-listings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: "/reset-password",
-  path: "/reset-password",
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthForgotRoute = AuthForgotRouteImport.update({
-  id: "/auth/forgot",
-  path: "/auth/forgot",
+  id: '/auth/forgot',
+  path: '/auth/forgot',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthResetRoute = AuthResetRouteImport.update({
-  id: "/auth/reset",
-  path: "/auth/reset",
+  id: '/auth/reset',
+  path: '/auth/reset',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthSigninRoute = AuthSigninRouteImport.update({
-  id: "/auth/signin",
-  path: "/auth/signin",
+  id: '/auth/signin',
+  path: '/auth/signin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
-  id: "/auth/signup",
-  path: "/auth/signup",
+  id: '/auth/signup',
+  path: '/auth/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthVerifyRoute = AuthVerifyRouteImport.update({
-  id: "/auth/verify",
-  path: "/auth/verify",
+  id: '/auth/verify',
+  path: '/auth/verify',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ListingsIdRoute = ListingsIdRouteImport.update({
-  id: "/listings/$id",
-  path: "/listings/$id",
+  id: '/listings/$id',
+  path: '/listings/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ListingsNewRoute = ListingsNewRouteImport.update({
-  id: "/listings/new",
-  path: "/listings/new",
+  id: '/listings/new',
+  path: '/listings/new',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ListingsIdEditRoute = ListingsIdEditRouteImport.update({
-  id: "/edit",
-  path: "/edit",
+  id: '/edit',
+  path: '/edit',
   getParentRoute: () => ListingsIdRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute
-  "/favorites": typeof FavoritesRoute
-  "/me": typeof MeRoute
-  "/my-listings": typeof MyListingsRoute
-  "/reset-password": typeof ResetPasswordRoute
-  "/auth/forgot": typeof AuthForgotRoute
-  "/auth/reset": typeof AuthResetRoute
-  "/auth/signin": typeof AuthSigninRoute
-  "/auth/signup": typeof AuthSignupRoute
-  "/auth/verify": typeof AuthVerifyRoute
-  "/listings/$id": typeof ListingsIdRouteWithChildren
-  "/listings/new": typeof ListingsNewRoute
-  "/listings/$id/edit": typeof ListingsIdEditRoute
+  '/': typeof IndexRoute
+  '/favorites': typeof FavoritesRoute
+  '/me': typeof MeRoute
+  '/my-listings': typeof MyListingsRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/auth/forgot': typeof AuthForgotRoute
+  '/auth/reset': typeof AuthResetRoute
+  '/auth/signin': typeof AuthSigninRoute
+  '/auth/signup': typeof AuthSignupRoute
+  '/auth/verify': typeof AuthVerifyRoute
+  '/listings/$id': typeof ListingsIdRouteWithChildren
+  '/listings/new': typeof ListingsNewRoute
+  '/listings/$id/edit': typeof ListingsIdEditRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute
-  "/favorites": typeof FavoritesRoute
-  "/me": typeof MeRoute
-  "/my-listings": typeof MyListingsRoute
-  "/reset-password": typeof ResetPasswordRoute
-  "/auth/forgot": typeof AuthForgotRoute
-  "/auth/reset": typeof AuthResetRoute
-  "/auth/signin": typeof AuthSigninRoute
-  "/auth/signup": typeof AuthSignupRoute
-  "/auth/verify": typeof AuthVerifyRoute
-  "/listings/$id": typeof ListingsIdRouteWithChildren
-  "/listings/new": typeof ListingsNewRoute
-  "/listings/$id/edit": typeof ListingsIdEditRoute
+  '/': typeof IndexRoute
+  '/favorites': typeof FavoritesRoute
+  '/me': typeof MeRoute
+  '/my-listings': typeof MyListingsRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/auth/forgot': typeof AuthForgotRoute
+  '/auth/reset': typeof AuthResetRoute
+  '/auth/signin': typeof AuthSigninRoute
+  '/auth/signup': typeof AuthSignupRoute
+  '/auth/verify': typeof AuthVerifyRoute
+  '/listings/$id': typeof ListingsIdRouteWithChildren
+  '/listings/new': typeof ListingsNewRoute
+  '/listings/$id/edit': typeof ListingsIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  "/": typeof IndexRoute
-  "/favorites": typeof FavoritesRoute
-  "/me": typeof MeRoute
-  "/my-listings": typeof MyListingsRoute
-  "/reset-password": typeof ResetPasswordRoute
-  "/auth/forgot": typeof AuthForgotRoute
-  "/auth/reset": typeof AuthResetRoute
-  "/auth/signin": typeof AuthSigninRoute
-  "/auth/signup": typeof AuthSignupRoute
-  "/auth/verify": typeof AuthVerifyRoute
-  "/listings/$id": typeof ListingsIdRouteWithChildren
-  "/listings/new": typeof ListingsNewRoute
-  "/listings/$id/edit": typeof ListingsIdEditRoute
+  '/': typeof IndexRoute
+  '/favorites': typeof FavoritesRoute
+  '/me': typeof MeRoute
+  '/my-listings': typeof MyListingsRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/auth/forgot': typeof AuthForgotRoute
+  '/auth/reset': typeof AuthResetRoute
+  '/auth/signin': typeof AuthSigninRoute
+  '/auth/signup': typeof AuthSignupRoute
+  '/auth/verify': typeof AuthVerifyRoute
+  '/listings/$id': typeof ListingsIdRouteWithChildren
+  '/listings/new': typeof ListingsNewRoute
+  '/listings/$id/edit': typeof ListingsIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | "/"
-    | "/favorites"
-    | "/me"
-    | "/my-listings"
-    | "/reset-password"
-    | "/auth/forgot"
-    | "/auth/reset"
-    | "/auth/signin"
-    | "/auth/signup"
-    | "/auth/verify"
-    | "/listings/$id"
-    | "/listings/new"
-    | "/listings/$id/edit"
+    | '/'
+    | '/favorites'
+    | '/me'
+    | '/my-listings'
+    | '/reset-password'
+    | '/auth/forgot'
+    | '/auth/reset'
+    | '/auth/signin'
+    | '/auth/signup'
+    | '/auth/verify'
+    | '/listings/$id'
+    | '/listings/new'
+    | '/listings/$id/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | "/"
-    | "/favorites"
-    | "/me"
-    | "/my-listings"
-    | "/reset-password"
-    | "/auth/forgot"
-    | "/auth/reset"
-    | "/auth/signin"
-    | "/auth/signup"
-    | "/auth/verify"
-    | "/listings/$id"
-    | "/listings/new"
-    | "/listings/$id/edit"
+    | '/'
+    | '/favorites'
+    | '/me'
+    | '/my-listings'
+    | '/reset-password'
+    | '/auth/forgot'
+    | '/auth/reset'
+    | '/auth/signin'
+    | '/auth/signup'
+    | '/auth/verify'
+    | '/listings/$id'
+    | '/listings/new'
+    | '/listings/$id/edit'
   id:
-    | "__root__"
-    | "/"
-    | "/favorites"
-    | "/me"
-    | "/my-listings"
-    | "/reset-password"
-    | "/auth/forgot"
-    | "/auth/reset"
-    | "/auth/signin"
-    | "/auth/signup"
-    | "/auth/verify"
-    | "/listings/$id"
-    | "/listings/new"
-    | "/listings/$id/edit"
+    | '__root__'
+    | '/'
+    | '/favorites'
+    | '/me'
+    | '/my-listings'
+    | '/reset-password'
+    | '/auth/forgot'
+    | '/auth/reset'
+    | '/auth/signin'
+    | '/auth/signup'
+    | '/auth/verify'
+    | '/listings/$id'
+    | '/listings/new'
+    | '/listings/$id/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -198,96 +198,96 @@ export interface RootRouteChildren {
   ListingsNewRoute: typeof ListingsNewRoute
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/": {
-      id: "/"
-      path: "/"
-      fullPath: "/"
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/favorites": {
-      id: "/favorites"
-      path: "/favorites"
-      fullPath: "/favorites"
+    '/favorites': {
+      id: '/favorites'
+      path: '/favorites'
+      fullPath: '/favorites'
       preLoaderRoute: typeof FavoritesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/me": {
-      id: "/me"
-      path: "/me"
-      fullPath: "/me"
+    '/me': {
+      id: '/me'
+      path: '/me'
+      fullPath: '/me'
       preLoaderRoute: typeof MeRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/my-listings": {
-      id: "/my-listings"
-      path: "/my-listings"
-      fullPath: "/my-listings"
+    '/my-listings': {
+      id: '/my-listings'
+      path: '/my-listings'
+      fullPath: '/my-listings'
       preLoaderRoute: typeof MyListingsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/reset-password": {
-      id: "/reset-password"
-      path: "/reset-password"
-      fullPath: "/reset-password"
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/auth/forgot": {
-      id: "/auth/forgot"
-      path: "/auth/forgot"
-      fullPath: "/auth/forgot"
+    '/auth/forgot': {
+      id: '/auth/forgot'
+      path: '/auth/forgot'
+      fullPath: '/auth/forgot'
       preLoaderRoute: typeof AuthForgotRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/auth/reset": {
-      id: "/auth/reset"
-      path: "/auth/reset"
-      fullPath: "/auth/reset"
+    '/auth/reset': {
+      id: '/auth/reset'
+      path: '/auth/reset'
+      fullPath: '/auth/reset'
       preLoaderRoute: typeof AuthResetRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/auth/signin": {
-      id: "/auth/signin"
-      path: "/auth/signin"
-      fullPath: "/auth/signin"
+    '/auth/signin': {
+      id: '/auth/signin'
+      path: '/auth/signin'
+      fullPath: '/auth/signin'
       preLoaderRoute: typeof AuthSigninRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/auth/signup": {
-      id: "/auth/signup"
-      path: "/auth/signup"
-      fullPath: "/auth/signup"
+    '/auth/signup': {
+      id: '/auth/signup'
+      path: '/auth/signup'
+      fullPath: '/auth/signup'
       preLoaderRoute: typeof AuthSignupRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/auth/verify": {
-      id: "/auth/verify"
-      path: "/auth/verify"
-      fullPath: "/auth/verify"
+    '/auth/verify': {
+      id: '/auth/verify'
+      path: '/auth/verify'
+      fullPath: '/auth/verify'
       preLoaderRoute: typeof AuthVerifyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/listings/$id": {
-      id: "/listings/$id"
-      path: "/listings/$id"
-      fullPath: "/listings/$id"
+    '/listings/$id': {
+      id: '/listings/$id'
+      path: '/listings/$id'
+      fullPath: '/listings/$id'
       preLoaderRoute: typeof ListingsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/listings/new": {
-      id: "/listings/new"
-      path: "/listings/new"
-      fullPath: "/listings/new"
+    '/listings/new': {
+      id: '/listings/new'
+      path: '/listings/new'
+      fullPath: '/listings/new'
       preLoaderRoute: typeof ListingsNewRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/listings/$id/edit": {
-      id: "/listings/$id/edit"
-      path: "/edit"
-      fullPath: "/listings/$id/edit"
+    '/listings/$id/edit': {
+      id: '/listings/$id/edit'
+      path: '/edit'
+      fullPath: '/listings/$id/edit'
       preLoaderRoute: typeof ListingsIdEditRouteImport
       parentRoute: typeof ListingsIdRoute
     }
@@ -302,7 +302,9 @@ const ListingsIdRouteChildren: ListingsIdRouteChildren = {
   ListingsIdEditRoute: ListingsIdEditRoute,
 }
 
-const ListingsIdRouteWithChildren = ListingsIdRoute._addFileChildren(ListingsIdRouteChildren)
+const ListingsIdRouteWithChildren = ListingsIdRoute._addFileChildren(
+  ListingsIdRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -318,11 +320,13 @@ const rootRouteChildren: RootRouteChildren = {
   ListingsIdRoute: ListingsIdRouteWithChildren,
   ListingsNewRoute: ListingsNewRoute,
 }
-export const routeTree = rootRouteImport._addFileChildren(rootRouteChildren)._addFileTypes<FileRouteTypes>()
+export const routeTree = rootRouteImport
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()
 
-import type { getRouter } from "./router.tsx"
-import type { createStart } from "@tanstack/react-start"
-declare module "@tanstack/react-start" {
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
   interface Register {
     ssr: true
     router: Awaited<ReturnType<typeof getRouter>>
