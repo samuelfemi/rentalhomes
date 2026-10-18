@@ -46,7 +46,9 @@ function NotFound() {
     <div className="mx-auto max-w-160 px-4 py-16 text-center sm:px-6">
       <p className="text-sm font-semibold uppercase text-muted-foreground">404</p>
       <h1 className="mt-2 text-balance text-3xl font-extrabold">Page not found</h1>
-      <p className="mt-2 text-pretty text-sm text-muted-foreground">The page you’re looking for doesn’t exist or was moved.</p>
+      <p className="mt-2 text-pretty text-sm text-muted-foreground">
+        The page you’re looking for doesn’t exist or was moved.
+      </p>
       <Link
         to="/"
         className="mt-6 inline-flex h-10 items-center justify-center rounded-md bg-primary px-6 text-xs font-semibold uppercase text-primary-foreground hover:bg-primary/90"
@@ -78,7 +80,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body className="min-h-dvh bg-paper text-foreground antialiased">
-        <QueryProvider>
+        <QueryClientProvider client={getQueryClient()}>
           <AuthProvider>
             <ToastProvider>
               <Header />

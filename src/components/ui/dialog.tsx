@@ -36,7 +36,7 @@ function DialogPopup({ className, children, ...props }: DialogPrimitive.Popup.Pr
         <DialogPrimitive.Popup
           data-slot="dialog-popup"
           className={cn(
-            "relative w-full max-w-md rounded-2xl border bg-white p-6 shadow-md transition-[transform,opacity] duration-200 ease-out data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
+            "relative w-full max-w-md rounded-2xl border bg-white p-6 shadow-md transition-all duration-200 ease-out data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
             className,
           )}
           {...props}

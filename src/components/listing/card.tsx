@@ -21,7 +21,7 @@ export function ListingCard({ listing }: { listing: Listing }) {
     <Link
       to="/listings/$id"
       params={{ id: listing.id }}
-      className="group flex flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition-[box-shadow] duration-200 ease-out hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="group flex flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition-shadow duration-200 ease-out hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <div className="relative aspect-4/3 overflow-hidden bg-muted">
         {listing.cover_image ? (
