@@ -7,11 +7,22 @@ import { Label } from "#/components/ui/label"
 import { PasswordInput } from "#/components/ui/password-input"
 import { authApi } from "#/lib/api"
 import { useAuth } from "#/lib/auth"
+import { type AuthRedirectSearch, safeInternalPath } from "#/lib/auth-guard"
 import { errorMessage } from "#/lib/errors"
+import { type RawSearch, rawString } from "#/lib/search-params"
 
-export const Route = createFileRoute("/auth/signin")({ component: SignIn })
+export const Route = createFileRoute("/auth/signin")({
+  validateSearch: (search: RawSearch): AuthRedirectSearch => {
+    const result: AuthRedirectSearch = {}
+    const redirect = rawString(search.redirect)
+    if (redirect) result.redirect = redirect
+    return result
+  },
+  component: SignIn,
+})
 
 function SignIn() {
+  const search = Route.useSearch()
   const nav = useNavigate()
   const { login } = useAuth()
   const [email, setEmail] = React.useState("")
@@ -26,7 +37,8 @@ function SignIn() {
     try {
       const tokens = await authApi.signin({ email: email.trim(), password })
       login(tokens)
-      nav({ to: "/" })
+      // Return users to the protected page that sent them here.
+      await nav({ href: safeInternalPath(search.redirect) })
     } catch (err) {
       console.error("[signin] failed:", err)
       setError(errorMessage(err, "Sign in failed"))

@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { Loader2, Upload } from "lucide-react"
 import * as React from "react"
+import { AccountGate } from "#/components/auth/account-gate"
 import { Button } from "#/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "#/components/ui/card"
 import { Input } from "#/components/ui/input"
@@ -9,10 +10,14 @@ import { Label } from "#/components/ui/label"
 import { useToast } from "#/components/ui/toast"
 import { authApi } from "#/lib/api"
 import { useAuth } from "#/lib/auth"
+import { requireAuth } from "#/lib/auth-guard"
 import { isCloudinaryConfigured, uploadImageToCloudinary } from "#/lib/cloudinary"
 import { errorMessage } from "#/lib/errors"
 
-export const Route = createFileRoute("/me")({ component: MePage })
+export const Route = createFileRoute("/me")({
+  beforeLoad: requireAuth,
+  component: MePage,
+})
 
 function MePage() {
   const { user, isAuthenticated, isLoading, refreshUser } = useAuth()
@@ -63,16 +68,11 @@ function MePage() {
   if (isLoading) return <div className="mx-auto max-w-180 px-4 py-10 sm:px-6">Loading…</div>
   if (!isAuthenticated || !user) {
     return (
-      <div className="mx-auto max-w-180 px-4 py-16 sm:px-6">
-        <Card>
-          <div className="p-8 text-center">
-            <p className="font-semibold">Sign in to view your profile</p>
-            <a href="/auth/signin" className="text-sm font-semibold text-primary hover:underline">
-              Go to sign in
-            </a>
-          </div>
-        </Card>
-      </div>
+      <AccountGate
+        variant="signed-out"
+        title="Sign in to view your profile"
+        description="Manage your account details and profile photo."
+      />
     )
   }
 
@@ -104,7 +104,9 @@ function MePage() {
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-lg border p-3">
                 <p className="text-xs text-muted-foreground">Email verified</p>
-                <p className="font-semibold">{user.email_verified ? "Yes" : "No — check inbox for verification link"}</p>
+                <p className="font-semibold">
+                  {user.email_verified ? "Yes" : "No — check inbox for verification link"}
+                </p>
               </div>
               <div className="rounded-lg border p-3">
                 <p className="text-xs text-muted-foreground">Member since</p>
@@ -127,59 +129,59 @@ function MePage() {
         <CardContent>
           <div className="space-y-3">
             <div className="flex items-center gap-4">
-            {url ? (
-              <img src={url} alt="Avatar preview" className="size-16 rounded-full border object-cover" />
-            ) : (
-              <span className="flex size-16 items-center justify-center rounded-full bg-muted text-lg font-bold text-muted-foreground">
-                {user.full_name[0]?.toUpperCase()}
-              </span>
-            )}
-            {isCloudinaryConfigured() ? (
-              <div>
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => void handleFile(e.target.files)}
-                />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={uploading || mutate.isPending || !user.email_verified}
-                  onClick={() => fileRef.current?.click()}
-                >
-                  {uploading ? (
-                    <>
-                      <Loader2 className="size-4 animate-spin" /> Uploading…
-                    </>
-                  ) : (
-                    <>
-                      <Upload className="size-4" /> Upload photo
-                    </>
-                  )}
-                </Button>
-              </div>
+              {url ? (
+                <img src={url} alt="Avatar preview" className="size-16 rounded-full border object-cover" />
+              ) : (
+                <span className="flex size-16 items-center justify-center rounded-full bg-muted text-lg font-bold text-muted-foreground">
+                  {user.full_name[0]?.toUpperCase()}
+                </span>
+              )}
+              {isCloudinaryConfigured() ? (
+                <div>
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => void handleFile(e.target.files)}
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={uploading || mutate.isPending || !user.email_verified}
+                    onClick={() => fileRef.current?.click()}
+                  >
+                    {uploading ? (
+                      <>
+                        <Loader2 className="size-4 animate-spin" /> Uploading…
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="size-4" /> Upload photo
+                      </>
+                    )}
+                  </Button>
+                </div>
+              ) : null}
+            </div>
+            {!user.email_verified ? (
+              <p className="rounded-md bg-warning-50 p-3 text-sm text-warning-800">
+                Verify email to change avatar — updates are blocked until verified.
+              </p>
             ) : null}
-          </div>
-          {!user.email_verified ? (
-            <p className="rounded-md bg-warning-50 p-3 text-sm text-warning-800">
-              Verify email to change avatar — updates are blocked until verified.
-            </p>
-          ) : null}
-          <Label htmlFor="avatar">Avatar URL</Label>
-          <Input
-            id="avatar"
-            placeholder="https://..."
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            disabled={!user.email_verified}
-          />
-          {msg ? <p className="text-sm text-success-600">{msg}</p> : null}
-          {err ? <p className="text-sm text-destructive">{err}</p> : null}
-          <Button onClick={() => mutate.mutate(url)} disabled={mutate.isPending || uploading || !user.email_verified}>
-            {mutate.isPending ? "Saving…" : "Save avatar"}
-          </Button>
+            <Label htmlFor="avatar">Avatar URL</Label>
+            <Input
+              id="avatar"
+              placeholder="https://..."
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              disabled={!user.email_verified}
+            />
+            {msg ? <p className="text-sm text-success-600">{msg}</p> : null}
+            {err ? <p className="text-sm text-destructive">{err}</p> : null}
+            <Button onClick={() => mutate.mutate(url)} disabled={mutate.isPending || uploading || !user.email_verified}>
+              {mutate.isPending ? "Saving…" : "Save avatar"}
+            </Button>
           </div>
         </CardContent>
       </Card>

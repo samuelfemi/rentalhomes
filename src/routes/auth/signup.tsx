@@ -7,11 +7,22 @@ import { Label } from "#/components/ui/label"
 import { PasswordInput } from "#/components/ui/password-input"
 import { authApi } from "#/lib/api"
 import { useAuth } from "#/lib/auth"
+import { type AuthRedirectSearch, safeInternalPath } from "#/lib/auth-guard"
 import { errorMessage } from "#/lib/errors"
+import { type RawSearch, rawString } from "#/lib/search-params"
 
-export const Route = createFileRoute("/auth/signup")({ component: SignUp })
+export const Route = createFileRoute("/auth/signup")({
+  validateSearch: (search: RawSearch): AuthRedirectSearch => {
+    const result: AuthRedirectSearch = {}
+    const redirect = rawString(search.redirect)
+    if (redirect) result.redirect = redirect
+    return result
+  },
+  component: SignUp,
+})
 
 function SignUp() {
+  const search = Route.useSearch()
   const nav = useNavigate()
   const { login } = useAuth()
   const [form, setForm] = React.useState({
@@ -38,7 +49,7 @@ function SignUp() {
       })
       login(tokens)
       setInfo("Account created. Check your email to verify (link also logged to API console).")
-      setTimeout(() => nav({ to: "/" }), 900)
+      setTimeout(() => void nav({ href: safeInternalPath(search.redirect) }), 900)
     } catch (err) {
       setError(errorMessage(err, "Sign up failed"))
     } finally {
@@ -56,8 +67,9 @@ function SignUp() {
         <CardContent>
           <form onSubmit={onSubmit} className="space-y-3">
             <div className="space-y-1.5">
-              <Label>Email</Label>
+              <Label htmlFor="signup-email">Email</Label>
               <Input
+                id="signup-email"
                 required
                 type="email"
                 value={form.email}
@@ -66,8 +78,9 @@ function SignUp() {
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Full name</Label>
+              <Label htmlFor="signup-name">Full name</Label>
               <Input
+                id="signup-name"
                 required
                 value={form.full_name}
                 onChange={(e) => setForm({ ...form, full_name: e.target.value })}
@@ -75,8 +88,9 @@ function SignUp() {
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Phone</Label>
+              <Label htmlFor="signup-phone">Phone</Label>
               <Input
+                id="signup-phone"
                 required
                 value={form.phone}
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
@@ -84,8 +98,9 @@ function SignUp() {
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Password (min 8)</Label>
+              <Label htmlFor="signup-password">Password (min 8)</Label>
               <PasswordInput
+                id="signup-password"
                 required
                 minLength={8}
                 value={form.password}

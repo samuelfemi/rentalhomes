@@ -39,8 +39,9 @@ function Forgot() {
         </CardHeader>
         <CardContent>
           <form onSubmit={onSubmit} className="space-y-3">
-            <Label>Email</Label>
+            <Label htmlFor="forgot-email">Email</Label>
             <Input
+              id="forgot-email"
               required
               type="email"
               value={email}

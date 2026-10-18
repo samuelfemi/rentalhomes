@@ -69,6 +69,10 @@ export function PhotoInput({
       setLinkError("Enter a valid http(s) image link.")
       return
     }
+    if (urls.includes(trimmed)) {
+      setLinkError("That photo is already in the list.")
+      return
+    }
     setLinkError(null)
     onChange([...urls, trimmed])
     setLink("")
@@ -115,21 +119,18 @@ export function PhotoInput({
 
       {urls.length > 0 ? (
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-          {urls.map((url, i) => (
-            <div
-              key={`${i}-${url}`}
-              className="group relative aspect-square overflow-hidden rounded-lg border bg-muted"
-            >
-              <img src={url} alt={`Photo ${i + 1}`} className="h-full w-full object-cover" />
-              {i === 0 ? (
+          {urls.map((url) => (
+            <div key={url} className="group relative aspect-square overflow-hidden rounded-lg border bg-muted">
+              <img src={url} alt="" className="h-full w-full object-cover" />
+              {url === urls[0] ? (
                 <span className="absolute left-1.5 top-1.5 rounded-full bg-black/70 px-2 py-0.5 text-xs font-bold text-white">
                   COVER
                 </span>
               ) : null}
               <button
                 type="button"
-                aria-label={`Remove photo ${i + 1}`}
-                onClick={() => onChange(urls.filter((_, j) => j !== i))}
+                aria-label="Remove photo"
+                onClick={() => onChange(urls.filter((u) => u !== url))}
                 className="absolute right-1.5 top-1.5 rounded-full bg-black/70 p-1.5 text-white opacity-0 transition group-hover:opacity-100 focus-visible:opacity-100"
               >
                 <Trash2 className="size-3.5" />

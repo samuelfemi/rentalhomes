@@ -67,7 +67,8 @@ export function MapPicker({
     return () => {
       cancelled = true
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    // The map initializes once; coordinate updates flow through the sync effect below.
+  }, [])
 
   // keep the map in sync when coords change from outside (e.g. geolocate)
   React.useEffect(() => {
@@ -99,7 +100,7 @@ export function MapPicker({
 
   return (
     <div className="overflow-hidden rounded-xl border">
-      <div ref={containerRef} className="h-80 w-full bg-muted" aria-label="Property location map" />
+      <div ref={containerRef} className="h-80 w-full bg-muted" />
       <p className="border-t bg-white px-3 py-2 text-xs text-muted-foreground">
         Click the map to drop the pin, or drag it. {lat.toFixed(5)}, {lng.toFixed(5)}
       </p>

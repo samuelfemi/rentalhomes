@@ -7,11 +7,17 @@ import { Label } from "#/components/ui/label"
 import { PasswordInput } from "#/components/ui/password-input"
 import { authApi } from "#/lib/api"
 import { errorMessage } from "#/lib/errors"
+import { type RawSearch, rawString } from "#/lib/search-params"
+
+export type ResetTokenSearch = { token?: string }
 
 export const Route = createFileRoute("/reset-password")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    token: typeof search.token === "string" ? search.token : "",
-  }),
+  validateSearch: (search: RawSearch): ResetTokenSearch => {
+    const result: ResetTokenSearch = {}
+    const token = rawString(search.token)
+    if (token) result.token = token
+    return result
+  },
   component: ResetPassword,
 })
 
@@ -50,15 +56,22 @@ function ResetPassword() {
         </CardHeader>
         <CardContent>
           <form onSubmit={onSubmit} className="space-y-3">
-            <Label>Reset token</Label>
+            <Label htmlFor="reset-token">Reset token</Label>
             <Input
+              id="reset-token"
               required
               value={token}
               onChange={(e) => setToken(e.target.value)}
               placeholder="paste token from email/logs"
             />
-            <Label>New password (min 8)</Label>
-            <PasswordInput required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
+            <Label htmlFor="reset-password">New password (min 8)</Label>
+            <PasswordInput
+              id="reset-password"
+              required
+              minLength={8}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
             {msg ? (
               <p className="rounded-md bg-success-50 p-3 text-sm text-success-700">
                 {msg}{" "}

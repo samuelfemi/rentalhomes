@@ -24,11 +24,7 @@ const cardTitleVariants = cva("font-semibold leading-none", {
   defaultVariants: { size: "default" },
 })
 
-function CardTitle({
-  className,
-  size,
-  ...props
-}: React.ComponentProps<"h3"> & VariantProps<typeof cardTitleVariants>) {
+function CardTitle({ className, size, ...props }: React.ComponentProps<"h3"> & VariantProps<typeof cardTitleVariants>) {
   return <h3 data-slot="card-title" className={cn(cardTitleVariants({ size }), className)} {...props} />
 }
 function CardDescription({ className, ...props }: React.ComponentProps<"p">) {

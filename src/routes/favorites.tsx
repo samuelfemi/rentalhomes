@@ -1,13 +1,16 @@
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { Heart } from "lucide-react"
-import { ListingCard, ListingSkeleton } from "#/components/listing/card"
+import { AccountGate } from "#/components/auth/account-gate"
+import { ListingCard, ListingSkeleton, SKELETON_SLOTS } from "#/components/listing/card"
 import { Button } from "#/components/ui/button"
 import { favoritesApi } from "#/lib/api"
 import { useAuth } from "#/lib/auth"
+import { requireAuth } from "#/lib/auth-guard"
 import { errorMessage } from "#/lib/errors"
 
 export const Route = createFileRoute("/favorites")({
+  beforeLoad: requireAuth,
   component: FavoritesPage,
 })
 
@@ -17,7 +20,8 @@ function FavoritesPage() {
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["favorites"],
-    queryFn: () => favoritesApi.list(1, 20),
+    // Limit matches the detail page's favorites cache so one entry serves both.
+    queryFn: () => favoritesApi.list(1, 100),
     enabled: isAuthenticated && isVerified,
   })
 
@@ -25,35 +29,24 @@ function FavoritesPage() {
 
   if (isAuthenticated && !isVerified) {
     return (
-      <div className="mx-auto max-w-320 px-4 py-16 sm:px-6">
-        <div className="rounded-2xl border border-warning-200 bg-warning-50 p-10 text-center">
-          <h1 className="text-xl font-bold">Verify your email to use favorites</h1>
-          <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-            You can browse listings now. Verify your email (check inbox or API logs for the link) to save favorites.
-          </p>
-          <Button asChild className="mt-4">
-            <Link to="/auth/verify">Verify email</Link>
-          </Button>
-          {isError ? <p className="mt-3 text-sm text-destructive">{errorMessage(error)}</p> : null}
-        </div>
-      </div>
+      <AccountGate
+        variant="unverified"
+        title="Verify your email to use favorites"
+        description="You can browse listings now. Verify your email (check inbox or API logs for the link) to save favorites."
+      >
+        {isError ? <p className="mt-3 text-sm text-destructive">{errorMessage(error)}</p> : null}
+      </AccountGate>
     )
   }
 
   if (!isAuthenticated) {
     return (
-      <div className="mx-auto max-w-320 px-4 py-16 sm:px-6">
-        <div className="rounded-2xl border bg-white p-10 text-center">
-          <Heart className="mx-auto size-10 text-muted-foreground" />
-          <h1 className="mt-3 text-xl font-bold">Sign in to see favorites</h1>
-          <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-            Save homes you love and revisit them here.
-          </p>
-          <Button asChild className="mt-4">
-            <Link to="/auth/signin">Sign in</Link>
-          </Button>
-        </div>
-      </div>
+      <AccountGate
+        variant="signed-out"
+        title="Sign in to see favorites"
+        description="Save homes you love and revisit them here."
+        icon={<Heart className="mx-auto size-10 text-muted-foreground" />}
+      />
     )
   }
 
@@ -72,7 +65,7 @@ function FavoritesPage() {
 
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {isLoading
-          ? Array.from({ length: 4 }).map((_, i) => <ListingSkeleton key={i} />)
+          ? SKELETON_SLOTS.slice(0, 4).map((slot) => <ListingSkeleton key={slot} />)
           : (data?.data ?? []).map((l) => <ListingCard key={l.id} listing={l} />)}
       </div>
 

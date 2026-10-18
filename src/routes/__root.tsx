@@ -1,14 +1,17 @@
 import { TanStackDevtools } from "@tanstack/react-devtools"
-import { createRootRoute, HeadContent, Link, Outlet, Scripts } from "@tanstack/react-router"
+import { type QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { createRootRouteWithContext, HeadContent, Link, Outlet, Scripts } from "@tanstack/react-router"
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
 import { Header } from "#/components/layout/header"
 import { VerifyBanner } from "#/components/layout/verify-banner"
+import { Button } from "#/components/ui/button"
 import { ToastProvider } from "#/components/ui/toast"
 import { AuthProvider } from "#/lib/auth"
-import { QueryProvider } from "#/providers/query-provider"
+import { errorMessage } from "#/lib/errors"
+import { getQueryClient } from "#/providers/query-provider"
 import appCss from "../styles.css?url"
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -18,11 +21,24 @@ export const Route = createRootRoute({
         name: "description",
         content: "House rental platform for Nigeria. Browse verified listings, save favorites, and list your property.",
       },
+      { name: "theme-color", content: "#4f39f6" },
+      { property: "og:title", content: "EazyRent — Find home, easily." },
+      {
+        property: "og:description",
+        content: "House rental platform for Nigeria. Browse verified listings, save favorites, and list your property.",
+      },
+      { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "EazyRent" },
+      { name: "twitter:card", content: "summary" },
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [
+      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+      { rel: "stylesheet", href: appCss },
+    ],
   }),
   shellComponent: RootDocument,
   notFoundComponent: NotFound,
+  errorComponent: RouteError,
 })
 
 function NotFound() {
@@ -37,6 +53,20 @@ function NotFound() {
       >
         Back to homes
       </Link>
+    </div>
+  )
+}
+
+function RouteError({ error }: { error: unknown }) {
+  return (
+    <div className="mx-auto max-w-160 px-4 py-16 text-center sm:px-6">
+      <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-8">
+        <h1 className="text-2xl font-extrabold tracking-tight">Something went wrong</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{errorMessage(error, "An unexpected error occurred.")}</p>
+        <Button asChild className="mt-6">
+          <Link to="/">Back to homes</Link>
+        </Button>
+      </div>
     </div>
   )
 }
@@ -58,30 +88,34 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 <div className="mx-auto flex max-w-320 flex-col gap-2 px-4 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
                   <span>© {new Date().getFullYear()} EazyRent — Built for the Nigerian market.</span>
                   <span className="flex gap-4">
-                    <a
-                      href="http://localhost:8080/swagger/index.html"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="hover:text-foreground hover:underline"
-                    >
-                      API Docs
-                    </a>
+                    {import.meta.env.DEV ? (
+                      <a
+                        href="http://localhost:8080/swagger/index.html"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:text-foreground hover:underline"
+                      >
+                        API Docs
+                      </a>
+                    ) : null}
                     <span>PostGIS • Go • TanStack</span>
                   </span>
                 </div>
               </footer>
             </ToastProvider>
           </AuthProvider>
-        </QueryProvider>
-        <TanStackDevtools
-          config={{ position: "bottom-right" }}
-          plugins={[
-            {
-              name: "Tanstack Router",
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-          ]}
-        />
+        </QueryClientProvider>
+        {import.meta.env.DEV ? (
+          <TanStackDevtools
+            config={{ position: "bottom-right" }}
+            plugins={[
+              {
+                name: "Tanstack Router",
+                render: <TanStackRouterDevtoolsPanel />,
+              },
+            ]}
+          />
+        ) : null}
         <Scripts />
       </body>
     </html>

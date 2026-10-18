@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { LocateFixed, MapPin } from "lucide-react"
 import * as React from "react"
+import { AccountGate } from "#/components/auth/account-gate"
 import { LAGOS_CENTER, MapPicker } from "#/components/listing/map-picker"
 import { PhotoInput } from "#/components/listing/photo-input"
 import { Button } from "#/components/ui/button"
@@ -11,10 +12,12 @@ import { Label } from "#/components/ui/label"
 import { useToast } from "#/components/ui/toast"
 import { listingsApi } from "#/lib/api"
 import { useAuth } from "#/lib/auth"
+import { requireAuth } from "#/lib/auth-guard"
 import { errorMessage } from "#/lib/errors"
 import { geocodeAddress } from "#/lib/geocode"
 
 export const Route = createFileRoute("/listings/new")({
+  beforeLoad: requireAuth,
   component: NewListing,
 })
 
@@ -77,13 +80,13 @@ function NewListing() {
       }
       return listing
     },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["listings"] })
-      qc.invalidateQueries({ queryKey: ["my-listings"] })
+    onSuccess: (listing) => {
+      void qc.invalidateQueries({ queryKey: ["listings"] })
+      void qc.invalidateQueries({ queryKey: ["my-listings"] })
       toast("Listing published", {
         description: "Your home is now visible to renters.",
       })
-      navigate({ to: "/" })
+      void navigate({ to: "/listings/$id", params: { id: listing.id } })
     },
     onError: (e: Error) => {
       setPhase("idle")
@@ -137,36 +140,20 @@ function NewListing() {
   if (isLoading) return <div className="mx-auto max-w-180 px-4 py-10 sm:px-6">Loading…</div>
   if (!isAuthenticated) {
     return (
-      <div className="mx-auto max-w-180 px-4 py-16 sm:px-6">
-        <Card>
-          <div className="p-8 text-center">
-            <p className="font-semibold">Sign in to list a home</p>
-            <Button asChild className="mt-4">
-              <a href="/auth/signin">Sign in</a>
-            </Button>
-          </div>
-        </Card>
-      </div>
+      <AccountGate
+        variant="signed-out"
+        title="Sign in to list a home"
+        description="Create an account to publish your property on EazyRent."
+      />
     )
   }
   if (!isVerified) {
     return (
-      <div className="mx-auto max-w-180 px-4 py-16 sm:px-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Verify email to list</CardTitle>
-            <CardDescription>You can browse listings now. Verify to publish.</CardDescription>
-          </CardHeader>
-          <div className="p-8 text-center">
-            <p className="text-sm text-muted-foreground">
-              Check inbox ({user?.email}) or API logs for the verification link.
-            </p>
-            <Button asChild className="mt-4">
-              <a href="/auth/verify">Go to verification</a>
-            </Button>
-          </div>
-        </Card>
-      </div>
+      <AccountGate
+        variant="unverified"
+        title="Verify email to list"
+        description="You can browse listings now. Verify to publish — check your inbox or the API logs for the link."
+      />
     )
   }
 
@@ -314,13 +301,7 @@ function NewListing() {
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <Label>Pin the location</Label>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="xs"
-                  onClick={useMyLocation}
-                  disabled={locating}
-                >
+                <Button type="button" variant="ghost" size="xs" onClick={useMyLocation} disabled={locating}>
                   <LocateFixed className="size-3.5" />
                   {locating ? "Locating…" : "Use my location"}
                 </Button>

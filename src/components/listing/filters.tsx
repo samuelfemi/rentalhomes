@@ -43,11 +43,7 @@ export function ListingFilters({
             />
           </div>
           <div className="flex gap-2">
-            <Select
-              value={values.status}
-              onChange={(e) => onChange({ status: e.target.value })}
-              className="min-w-37.5"
-            >
+            <Select value={values.status} onChange={(e) => onChange({ status: e.target.value })} className="min-w-37.5">
               <option value="">Any status</option>
               <option value="avaiable">Available</option>
               <option value="rented">Rented</option>

@@ -1,6 +1,7 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import * as React from "react"
+import { QueryClient } from "@tanstack/react-query"
 import { isBrowser } from "#/lib/env"
+
+let browserQueryClient: QueryClient | undefined
 
 function makeQueryClient() {
   return new QueryClient({
@@ -18,9 +19,13 @@ function makeQueryClient() {
   })
 }
 
-let browserQueryClient: QueryClient | undefined
-
-function getQueryClient() {
+/**
+ * The single QueryClient shared by route loaders (via router context) and
+ * components (via QueryClientProvider in the root shell). On the server a
+ * fresh client is created per request; on the browser a singleton survives
+ * navigation.
+ */
+export function getQueryClient() {
   if (!isBrowser) {
     // Server: always create a fresh client per request
     return makeQueryClient()
@@ -28,9 +33,4 @@ function getQueryClient() {
   // Client: reuse a singleton so cache survives navigation
   browserQueryClient ??= makeQueryClient()
   return browserQueryClient
-}
-
-export function QueryProvider({ children }: { children: React.ReactNode }) {
-  const queryClient = React.useState(getQueryClient)[0]
-  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
 }

@@ -1,10 +1,18 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import * as React from "react"
-import { type AuthTokens, authApi, clearTokens, getStoredTokens, setTokens, type User } from "./api"
+import {
+  type AuthTokens,
+  authApi,
+  clearTokens,
+  getStoredTokens,
+  setTokens,
+  subscribeToTokenChanges,
+  type User,
+} from "./api"
 import { isBrowser } from "./env"
 
 type AuthState = {
-  user: User | null | undefined
+  user: User | null
   isLoading: boolean
   isAuthenticated: boolean
   login: (tokens: AuthTokens) => void
@@ -16,7 +24,19 @@ const AuthContext = React.createContext<AuthState | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const qc = useQueryClient()
-  const hasToken = isBrowser ? getStoredTokens().access !== null : false
+
+  // False during SSR and the hydration pass (so client render matches the
+  // server render), then reflects localStorage. Re-syncs whenever tokens are
+  // written or cleared anywhere — login, logout, or a failed token refresh —
+  // so the auth UI can never go stale after the fact.
+  const [hasToken, setHasToken] = React.useState(false)
+
+  React.useEffect(() => {
+    if (!isBrowser) return
+    const sync = () => setHasToken(getStoredTokens().access !== null)
+    sync()
+    return subscribeToTokenChanges(sync)
+  }, [])
 
   const { data: user, isLoading } = useQuery({
     queryKey: ["me"],
@@ -26,9 +46,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     staleTime: 60_000,
   })
 
+  // Token loss (logout or failed refresh) must drop the cached user, so the
+  // UI cannot keep rendering a session that no longer exists.
+  React.useEffect(() => {
+    if (!hasToken) qc.removeQueries({ queryKey: ["me"] })
+  }, [hasToken, qc])
+
   const login = React.useCallback(
     (tokens: AuthTokens) => {
-      setTokens(tokens)
+      setTokens(tokens) // notifies subscribers → hasToken flips → query enables
       qc.invalidateQueries({ queryKey: ["me"] })
     },
     [qc],
@@ -38,9 +64,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await authApi.signout()
     } finally {
-      clearTokens()
-      qc.setQueryData(["me"], null)
-      qc.clear()
+      clearTokens() // notifies subscribers → hasToken flips false
+      qc.clear() // drop every cached query alongside the session
     }
   }, [qc])
 
@@ -48,23 +73,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     qc.invalidateQueries({ queryKey: ["me"] })
   }, [qc])
 
-  const value: AuthState = {
-    user: user ?? null,
-    isLoading,
-    isAuthenticated: !!user,
-    login,
-    logout,
-    refreshUser,
-  }
-
-  // when no token, isLoading is false and user is null — normalize
-  if (!hasToken) {
-    value.isLoading = false
-    value.isAuthenticated = false
-    value.user = null
-  } else if (isLoading) {
-    value.user = undefined
-  }
+  const value = React.useMemo<AuthState>(
+    () => ({
+      user: hasToken ? (user ?? null) : null,
+      isLoading: hasToken && isLoading,
+      isAuthenticated: hasToken && !!user,
+      login,
+      logout,
+      refreshUser,
+    }),
+    [hasToken, user, isLoading, login, logout, refreshUser],
+  )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

@@ -1,13 +1,18 @@
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { Plus } from "lucide-react"
-import { ListingCard, ListingSkeleton } from "#/components/listing/card"
+import { AccountGate } from "#/components/auth/account-gate"
+import { ListingCard, ListingSkeleton, SKELETON_SLOTS } from "#/components/listing/card"
 import { Button } from "#/components/ui/button"
 import { listingsApi } from "#/lib/api"
 import { useAuth } from "#/lib/auth"
+import { requireAuth } from "#/lib/auth-guard"
 import { errorMessage } from "#/lib/errors"
 
-export const Route = createFileRoute("/my-listings")({ component: MyListings })
+export const Route = createFileRoute("/my-listings")({
+  beforeLoad: requireAuth,
+  component: MyListings,
+})
 
 function MyListings() {
   const { isAuthenticated, isLoading: authLoading, user } = useAuth()
@@ -21,31 +26,22 @@ function MyListings() {
   if (authLoading) return <div className="mx-auto max-w-320 px-4 py-10 sm:px-6">Loading…</div>
   if (isAuthenticated && !isVerified) {
     return (
-      <div className="mx-auto max-w-320 px-4 py-16 sm:px-6">
-        <div className="rounded-2xl border border-warning-200 bg-warning-50 p-10 text-center">
-          <h1 className="text-xl font-bold">Verify your email to manage listings</h1>
-          <p className="text-sm text-muted-foreground">
-            You can browse homes. Verify to create and track your listings.
-          </p>
-          <Button asChild className="mt-4">
-            <Link to="/auth/verify">Verify email</Link>
-          </Button>
-          {isError ? <div className="mt-3 text-sm text-destructive">{errorMessage(error)}</div> : null}
-        </div>
-      </div>
+      <AccountGate
+        variant="unverified"
+        title="Verify your email to manage listings"
+        description="You can browse homes. Verify to create and track your listings."
+      >
+        {isError ? <div className="mt-3 text-sm text-destructive">{errorMessage(error)}</div> : null}
+      </AccountGate>
     )
   }
   if (!isAuthenticated) {
     return (
-      <div className="mx-auto max-w-320 px-4 py-16 sm:px-6">
-        <div className="rounded-2xl border bg-white p-10 text-center">
-          <h1 className="text-xl font-bold">Sign in to manage listings</h1>
-          <p className="text-sm text-muted-foreground">Landlords can create, edit and track their homes.</p>
-          <Button asChild className="mt-4">
-            <Link to="/auth/signin">Sign in</Link>
-          </Button>
-        </div>
-      </div>
+      <AccountGate
+        variant="signed-out"
+        title="Sign in to manage listings"
+        description="Landlords can create, edit and track their homes."
+      />
     )
   }
 
@@ -71,7 +67,7 @@ function MyListings() {
 
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {isLoading
-          ? Array.from({ length: 4 }).map((_, i) => <ListingSkeleton key={i} />)
+          ? SKELETON_SLOTS.slice(0, 4).map((slot) => <ListingSkeleton key={slot} />)
           : (data?.data ?? []).map((l) => <ListingCard key={l.id} listing={l} />)}
       </div>
 

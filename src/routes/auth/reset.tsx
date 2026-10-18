@@ -1,74 +1,25 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
-import * as React from "react"
-import { Button } from "#/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card"
-import { Input } from "#/components/ui/input"
-import { Label } from "#/components/ui/label"
-import { PasswordInput } from "#/components/ui/password-input"
-import { authApi } from "#/lib/api"
-import { errorMessage } from "#/lib/errors"
+import { createFileRoute, redirect } from "@tanstack/react-router"
+import { type RawSearch, rawString } from "#/lib/search-params"
 
-export const Route = createFileRoute("/auth/reset")({ component: Reset })
+export type ResetTokenSearch = { token?: string }
 
-function Reset() {
-  const [token, setToken] = React.useState("")
-  const [password, setPassword] = React.useState("")
-  const [msg, setMsg] = React.useState<string | null>(null)
-  const [err, setErr] = React.useState<string | null>(null)
-  const [loading, setLoading] = React.useState(false)
-
-  React.useEffect(() => {
-    const t = new URLSearchParams(window.location.search).get("token")
-    if (t) setToken(t)
-  }, [])
-
-  const onSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setLoading(true)
-    setErr(null)
-    setMsg(null)
-    try {
-      await authApi.reset(token.trim(), password)
-      setMsg("Password reset — you can now sign in.")
-    } catch (e) {
-      setErr(errorMessage(e))
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return (
-    <div className="mx-auto max-w-110 px-4 py-16 sm:px-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Reset password</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={onSubmit} className="space-y-3">
-            <Label>Reset token</Label>
-            <Input
-              required
-              value={token}
-              onChange={(e) => setToken(e.target.value)}
-              placeholder="paste token from email/logs"
-            />
-            <Label>New password (min 8)</Label>
-            <PasswordInput required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
-            {msg ? (
-              <p className="rounded-md bg-success-50 p-3 text-sm text-success-700">
-                {msg}{" "}
-                <Link to="/auth/signin" className="font-semibold underline">
-                  Sign in
-                </Link>
-              </p>
-            ) : null}
-            {err ? <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{err}</p> : null}
-            <Button type="submit" disabled={loading} className="w-full">
-              {loading ? "Resetting…" : "Reset password"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
-  )
-}
+/**
+ * /auth/reset used to be a duplicate of /reset-password. Emails may still
+ * point at either path, so this route forwards to the canonical one while
+ * preserving the ?token= parameter.
+ */
+export const Route = createFileRoute("/auth/reset")({
+  validateSearch: (search: RawSearch): ResetTokenSearch => {
+    const result: ResetTokenSearch = {}
+    const token = rawString(search.token)
+    if (token) result.token = token
+    return result
+  },
+  beforeLoad: ({ search }) => {
+    throw redirect({
+      to: "/reset-password",
+      search: search.token ? { token: search.token } : {},
+      replace: true,
+    })
+  },
+})

@@ -2,11 +2,10 @@ import { isBrowser, readEnv } from "./env"
 
 const API_BASE = readEnv("VITE_API_URL") || "http://localhost:8080"
 
-function networkError(path: string, cause: unknown): Error {
+function networkError(cause: unknown): Error {
   const detail = cause instanceof Error ? cause.message : String(cause)
   return new Error(
-    `Cannot reach API ${API_BASE}${path} (${detail || "network error"}). ` +
-      `Is the Go API running (task dev in C:\\Users\\FEMI\\eazyrent)?`,
+    `Cannot reach the server (${detail || "network error"}). Please check your connection and try again shortly.`,
   )
 }
 
@@ -27,6 +26,23 @@ export type AuthTokens = {
 }
 
 export type ListingStatus = "avaiable" | "rented" | "inative"
+
+/**
+ * Wire values come from the Go API (typos included: "avaiable", "inative").
+ * Map them to display labels in ONE place instead of re-typing them per view.
+ */
+export const LISTING_STATUS_LABELS = {
+  avaiable: "Available",
+  rented: "Rented",
+  inative: "Inactive",
+} satisfies Record<ListingStatus, string>
+
+export function listingStatusLabel(status: string): string {
+  if (status === "avaiable" || status === "rented" || status === "inative") {
+    return LISTING_STATUS_LABELS[status]
+  }
+  return status
+}
 
 export type Listing = {
   id: string
@@ -82,22 +98,39 @@ export type ListingFilters = {
   search?: string
 }
 
+const ACCESS_KEY = "easyrent_access"
+const REFRESH_KEY = "easyrent_refresh"
+
+/** Subscribers notified whenever tokens are written or cleared. */
+const tokenListeners = new Set<() => void>()
+
 function getAccessToken(): string | null {
   if (!isBrowser) return null
-  return localStorage.getItem("easyrent_access")
+  return localStorage.getItem(ACCESS_KEY)
 }
 function getRefreshToken(): string | null {
   if (!isBrowser) return null
-  return localStorage.getItem("easyrent_refresh")
+  return localStorage.getItem(REFRESH_KEY)
+}
+
+export function subscribeToTokenChanges(listener: () => void): () => void {
+  tokenListeners.add(listener)
+  return () => tokenListeners.delete(listener)
+}
+
+function notifyTokenChange() {
+  for (const listener of tokenListeners) listener()
 }
 
 export function setTokens(t: AuthTokens) {
-  localStorage.setItem("easyrent_access", t.access_token)
-  localStorage.setItem("easyrent_refresh", t.refresh_token)
+  localStorage.setItem(ACCESS_KEY, t.access_token)
+  localStorage.setItem(REFRESH_KEY, t.refresh_token)
+  notifyTokenChange()
 }
 export function clearTokens() {
-  localStorage.removeItem("easyrent_access")
-  localStorage.removeItem("easyrent_refresh")
+  localStorage.removeItem(ACCESS_KEY)
+  localStorage.removeItem(REFRESH_KEY)
+  notifyTokenChange()
 }
 export function getStoredTokens() {
   return { access: getAccessToken(), refresh: getRefreshToken() }
@@ -124,22 +157,38 @@ async function handleResponse<T>(res: Response): Promise<T> {
   return res.json() as Promise<T>
 }
 
+// Single-flight refresh: concurrent 401s share one in-flight refresh call
+// instead of stampeding the endpoint with parallel requests.
+let refreshInFlight: Promise<string | null> | null = null
+
 async function refreshIfNeeded(): Promise<string | null> {
   const refresh = getRefreshToken()
   if (!refresh) return null
-  const res = await fetch(`${API_BASE}/auth/refresh`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ refresh_token: refresh }),
-  })
-  if (!res.ok) {
-    clearTokens()
-    return null
-  }
-  // SAFETY: POST /auth/refresh responds with AuthTokens per the Go API contract.
-  const tokens = (await res.json()) as AuthTokens
-  setTokens(tokens)
-  return tokens.access_token
+  if (refreshInFlight) return refreshInFlight
+
+  refreshInFlight = (async () => {
+    try {
+      const res = await fetch(`${API_BASE}/auth/refresh`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: refresh }),
+      })
+      if (!res.ok) {
+        clearTokens()
+        return null
+      }
+      // SAFETY: POST /auth/refresh responds with AuthTokens per the Go API contract.
+      const tokens = (await res.json()) as AuthTokens
+      setTokens(tokens)
+      return tokens.access_token
+    } catch {
+      return null
+    } finally {
+      refreshInFlight = null
+    }
+  })()
+
+  return refreshInFlight
 }
 
 export async function apiFetch<T>(path: string, init: RequestInit = {}, retry = true): Promise<T> {
@@ -152,7 +201,7 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}, retry = 
   try {
     res = await fetch(`${API_BASE}${path}`, { ...init, headers })
   } catch (cause) {
-    throw networkError(path, cause)
+    throw networkError(cause)
   }
   if (res.status === 401 && retry && getRefreshToken()) {
     const newToken = await refreshIfNeeded()
@@ -167,7 +216,7 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}, retry = 
           headers: retryHeaders,
         })
       } catch (cause) {
-        throw networkError(path, cause)
+        throw networkError(cause)
       }
       return handleResponse<T>(retryRes)
     }
@@ -183,7 +232,7 @@ export async function publicFetch<T>(path: string, init: RequestInit = {}): Prom
   try {
     res = await fetch(`${API_BASE}${path}`, { ...init, headers })
   } catch (cause) {
-    throw networkError(path, cause)
+    throw networkError(cause)
   }
   return handleResponse<T>(res)
 }
@@ -227,6 +276,27 @@ export const authApi = {
   },
 }
 
+export type ListingCreate = {
+  title: string
+  description: string
+  price: string
+  rooms: number
+  furnished: boolean
+  latitude: number
+  longitude: number
+  address: string
+}
+
+export type ListingUpdate = Partial<{
+  title: string
+  description: string
+  price: string
+  rooms: number
+  latitude: number
+  longitude: number
+  address: string
+}>
+
 /* Listings */
 export const listingsApi = {
   list: (filters: ListingFilters = {}) => {
@@ -240,33 +310,12 @@ export const listingsApi = {
   },
   my: (page = 1, limit = 20) => apiFetch<PageResponse<Listing>>(`/listings/my?page=${page}&limit=${limit}`),
   get: (id: string) => publicFetch<ListingDetail>(`/listings/${id}`),
-  create: (body: {
-    title: string
-    description: string
-    price: string
-    rooms: number
-    furnished: boolean
-    latitude: number
-    longitude: number
-    address: string
-  }) =>
+  create: (body: ListingCreate) =>
     apiFetch<Listing>("/listings", {
       method: "POST",
       body: JSON.stringify(body),
     }),
-  update: (
-    id: string,
-    body: Partial<{
-      title: string
-      description: string
-      price: string
-      rooms: number
-      furnished: boolean
-      latitude: number
-      longitude: number
-      address: string
-    }>,
-  ) =>
+  update: (id: string, body: ListingUpdate) =>
     apiFetch<Listing>(`/listings/${id}`, {
       method: "PATCH",
       body: JSON.stringify(body),

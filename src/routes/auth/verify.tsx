@@ -1,27 +1,50 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
 import * as React from "react"
 import { Button } from "#/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card"
 import { authApi } from "#/lib/api"
+import { useAuth } from "#/lib/auth"
+import { safeInternalPath } from "#/lib/auth-guard"
+import { type RawSearch, rawString } from "#/lib/search-params"
 
-export const Route = createFileRoute("/auth/verify")({ component: Verify })
+export type VerifySearch = { token?: string; redirect?: string }
+
+export const Route = createFileRoute("/auth/verify")({
+  validateSearch: (search: RawSearch): VerifySearch => {
+    const result: VerifySearch = {}
+    const token = rawString(search.token)
+    const redirect = rawString(search.redirect)
+    if (token) result.token = token
+    if (redirect) result.redirect = redirect
+    return result
+  },
+  component: Verify,
+})
 
 function Verify() {
+  const search = Route.useSearch()
+  const { refreshUser } = useAuth()
+  const navigate = useNavigate()
   const [state, setState] = React.useState<"idle" | "loading" | "ok" | "error">("idle")
   const [msg, setMsg] = React.useState("")
   const fetchedRef = React.useRef(false)
 
   React.useEffect(() => {
-    const t = (new URLSearchParams(window.location.search).get("token") || "").trim()
-    if (!t) return
-    if (fetchedRef.current) return
+    const token = (search.token ?? "").trim()
+    if (!token || fetchedRef.current) return
     fetchedRef.current = true
     setState("loading")
     authApi
-      .verify(t)
+      .verify(token)
       .then(() => {
         setState("ok")
-        setMsg("Email verified. You can now sign in.")
+        setMsg("Email verified.")
+        // Pick up email_verified everywhere (banner, gates) without a reload.
+        refreshUser()
+        // If a guarded page sent the user here, send them back once verified.
+        if (search.redirect) {
+          window.setTimeout(() => void navigate({ href: safeInternalPath(search.redirect) }), 1200)
+        }
       })
       .catch((e: Error) => {
         const m = e.message || "Verification failed"
@@ -31,7 +54,7 @@ function Verify() {
         setState("error")
         setMsg(hint)
       })
-  }, [])
+  }, [search.token, search.redirect, refreshUser, navigate])
 
   return (
     <div className="mx-auto max-w-120 px-4 py-16 sm:px-6">

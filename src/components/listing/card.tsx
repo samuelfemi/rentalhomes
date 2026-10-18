@@ -2,25 +2,21 @@ import { Link } from "@tanstack/react-router"
 import { cn } from "cn"
 import { BedDouble, Heart, MapPin, Sofa } from "lucide-react"
 import { Badge } from "#/components/ui/badge"
-import { formatPrice, type Listing, type ListingStatus } from "#/lib/api"
+import { formatPrice, type Listing, type ListingStatus, listingStatusLabel } from "#/lib/api"
+import { withCloudinaryTransform } from "#/lib/cloudinary"
 
-type StatusBadge = {
-  label: string
-  variant: "success" | "secondary" | "warning"
-}
-type StatusLabels = { [status in ListingStatus]: StatusBadge }
+type StatusVariant = "success" | "secondary" | "warning"
 
-const statusLabel: StatusLabels = {
-  avaiable: { label: "Available", variant: "success" },
-  rented: { label: "Rented", variant: "secondary" },
-  inative: { label: "Inactive", variant: "warning" },
-}
+/** UI-only concern: which badge style each wire status maps to. */
+const statusVariants = {
+  avaiable: "success",
+  rented: "secondary",
+  inative: "warning",
+} satisfies { [status in ListingStatus]: StatusVariant }
 
 export function ListingCard({ listing }: { listing: Listing }) {
-  const s = statusLabel[listing.status] ?? {
-    label: listing.status,
-    variant: "secondary" as const,
-  }
+  const variant = statusVariants[listing.status] ?? "secondary"
+  const label = listingStatusLabel(listing.status)
   return (
     <Link
       to="/listings/$id"
@@ -30,7 +26,7 @@ export function ListingCard({ listing }: { listing: Listing }) {
       <div className="relative aspect-4/3 overflow-hidden bg-muted">
         {listing.cover_image ? (
           <img
-            src={listing.cover_image}
+            src={withCloudinaryTransform(listing.cover_image, "f_auto,q_auto,w_640")}
             alt={listing.title}
             className="h-full w-full object-cover transition-transform duration-200 ease-out group-hover:scale-105"
             loading="lazy"
@@ -42,7 +38,7 @@ export function ListingCard({ listing }: { listing: Listing }) {
         )}
         <div className="absolute left-3 top-3 flex items-center gap-2">
           <span className="rounded-full shadow">
-            <Badge variant={s.variant}>{s.label}</Badge>
+            <Badge variant={variant}>{label}</Badge>
           </span>
           {listing.furnished ? (
             <Badge variant="overlay">
@@ -104,3 +100,6 @@ export function ListingSkeleton() {
     </div>
   )
 }
+
+/** Stable slot keys for skeleton grids (array indices would be unstable keys). */
+export const SKELETON_SLOTS = [1, 2, 3, 4, 5, 6, 7, 8]

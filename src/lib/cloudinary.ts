@@ -8,6 +8,24 @@ export function isCloudinaryConfigured() {
 }
 
 /**
+ * Insert a Cloudinary transformation into a cloudinary CDN URL
+ * (e.g. "f_auto,q_auto,w_640") so images ship at the size the layout
+ * actually needs, in a modern format, instead of full-resolution originals.
+ * Non-Cloudinary URLs are returned untouched (they are arbitrary user input).
+ */
+export function withCloudinaryTransform(url: string, transform: string): string {
+  const marker = "/upload/"
+  const index = url.indexOf(marker)
+  if (index === -1) return url
+  const after = url.slice(index + marker.length)
+  const firstSegment = after.split("/")[0]
+  // A segment holding an existing transformation (commas, or known keys)
+  // means the URL was already composed with transforms — leave it alone.
+  if (firstSegment.includes(",") || /^(f_|q_|w_|h_|c_|dpr_|fl_)/.test(firstSegment)) return url
+  return `${url.slice(0, index + marker.length)}${transform}/${after}`
+}
+
+/**
  * Upload an image straight to Cloudinary with an unsigned preset
  * (same flow as avatars — no secret ever touches the browser).
  * Returns the secure_url to store via POST /listings/{id}/media.

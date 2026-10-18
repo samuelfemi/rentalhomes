@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router"
+import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router"
+import { cn } from "cn"
 import { ArrowLeft, BedDouble, Heart, MapPin, Pencil, Phone, Sofa, Trash2 } from "lucide-react"
 import * as React from "react"
 import { Badge } from "#/components/ui/badge"
@@ -7,60 +8,114 @@ import { Button } from "#/components/ui/button"
 import { Card } from "#/components/ui/card"
 import { Dialog, DialogDescription, DialogFooter, DialogPopup, DialogTitle } from "#/components/ui/dialog"
 import { useToast } from "#/components/ui/toast"
-import { favoritesApi, formatPrice, type ListingStatus, listingsApi } from "#/lib/api"
+import {
+  favoritesApi,
+  formatPrice,
+  type Listing,
+  type ListingDetail,
+  listingStatusLabel,
+  listingsApi,
+  type PageResponse,
+} from "#/lib/api"
 import { useAuth } from "#/lib/auth"
+import { withCloudinaryTransform } from "#/lib/cloudinary"
 import { errorMessage } from "#/lib/errors"
 
 export const Route = createFileRoute("/listings/$id")({
+  loader: async ({ context, params }) => {
+    // Warms the cache for SSR and intent preloads. Failures stay on the
+    // component's inline "listing not found" card as the single error surface.
+    return context.queryClient
+      .ensureQueryData({ queryKey: ["listing", params.id], queryFn: () => listingsApi.get(params.id) })
+      .catch(() => undefined)
+  },
   component: DetailPage,
 })
 
 function DetailPage() {
   const { id } = Route.useParams()
+  const loaderData = Route.useLoaderData()
   const { isAuthenticated, user } = useAuth()
   const isVerified = !!user?.email_verified
+  const canFavorite = isAuthenticated && isVerified
   const qc = useQueryClient()
+  const navigate = useNavigate()
   const { toast } = useToast()
-  const [active, setActive] = React.useState(0)
+  const [selected, setSelected] = React.useState(0)
   const [confirmDelete, setConfirmDelete] = React.useState(false)
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["listing", id],
     queryFn: () => listingsApi.get(id),
+    initialData: loaderData,
   })
+
+  const { data: favorites } = useQuery({
+    queryKey: ["favorites"],
+    queryFn: () => favoritesApi.list(1, 100),
+    enabled: canFavorite,
+  })
+  const isFavorited = favorites?.data.some((l) => l.id === id) ?? false
 
   const matches = useRouterState({ select: (s) => s.matches })
   const isEditing = matches.some((m) => m.routeId === "/listings/$id/edit")
 
-  const favAdd = useMutation({
-    mutationFn: () => favoritesApi.add(id),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["listing", id] })
-      qc.invalidateQueries({ queryKey: ["favorites"] })
-      toast("Saved to favorites", {
-        description: "Find it anytime under Favorites.",
-      })
+  // One toggle instead of separate Save/Unsave actions: the heart reflects
+  // real state, and count changes land optimistically with rollback on error.
+  const favToggle = useMutation({
+    mutationFn: async () => {
+      if (isFavorited) await favoritesApi.remove(id)
+      else await favoritesApi.add(id)
     },
-    onError: (e: Error) => toast("Could not save", { description: e.message, variant: "error" }),
-  })
-  const favRemove = useMutation({
-    mutationFn: () => favoritesApi.remove(id),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["listing", id] })
-      qc.invalidateQueries({ queryKey: ["favorites"] })
-      toast("Removed from favorites")
+    onMutate: async () => {
+      await Promise.all([
+        qc.cancelQueries({ queryKey: ["favorites"] }),
+        qc.cancelQueries({ queryKey: ["listing", id] }),
+      ])
+      const prevFavorites = qc.getQueryData<PageResponse<Listing>>(["favorites"])
+      const prevDetail = qc.getQueryData<ListingDetail>(["listing", id])
+      const current = prevDetail?.listing ?? data?.listing
+      if (current) {
+        const nextCount = Math.max(0, current.favorite_count + (isFavorited ? -1 : 1))
+        if (prevDetail) {
+          qc.setQueryData<ListingDetail>(["listing", id], {
+            ...prevDetail,
+            listing: { ...current, favorite_count: nextCount },
+          })
+        }
+        if (prevFavorites) {
+          qc.setQueryData<PageResponse<Listing>>(["favorites"], {
+            ...prevFavorites,
+            data: isFavorited
+              ? prevFavorites.data.filter((l) => l.id !== id)
+              : [{ ...current, favorite_count: nextCount }, ...prevFavorites.data],
+          })
+        }
+      }
+      return { prevFavorites, prevDetail }
     },
-    onError: (e: Error) => toast("Could not remove", { description: e.message, variant: "error" }),
+    onError: (cause, _vars, snapshot) => {
+      if (snapshot?.prevFavorites) qc.setQueryData(["favorites"], snapshot.prevFavorites)
+      if (snapshot?.prevDetail) qc.setQueryData(["listing", id], snapshot.prevDetail)
+      toast("Could not update favorites", { description: errorMessage(cause, "Try again"), variant: "error" })
+    },
+    onSettled: () => {
+      void qc.invalidateQueries({ queryKey: ["listing", id] })
+      void qc.invalidateQueries({ queryKey: ["favorites"] })
+    },
   })
 
   const del = useMutation({
     mutationFn: () => listingsApi.remove(id),
     onSuccess: () => {
-      window.location.href = "/my-listings"
+      void qc.invalidateQueries({ queryKey: ["listings"] })
+      void qc.invalidateQueries({ queryKey: ["my-listings"] })
+      toast("Listing deleted", { description: "Your listing has been removed." })
+      void navigate({ to: "/my-listings" })
     },
-    onError: (e: Error) => {
+    onError: (cause: Error) => {
       setConfirmDelete(false)
-      toast("Could not delete", { description: e.message, variant: "error" })
+      toast("Could not delete", { description: cause.message, variant: "error" })
     },
   })
 
@@ -93,14 +148,22 @@ function DetailPage() {
 
   const { listing, media, landlord_name, landlord_phone } = data
   const isOwner = isAuthenticated && user?.id === listing.landlord_id
+  const active = Math.min(selected, Math.max(0, media.length - 1))
   const cover = media[active]?.url ?? listing.cover_image ?? null
-  type StatusNames = { [status in ListingStatus]: string }
-  const statusMap: StatusNames = {
-    avaiable: "Available",
-    rented: "Rented",
-    inative: "Inactive",
+  const statusLabel = listingStatusLabel(listing.status)
+  const favPending = favToggle.isPending
+
+  // Arrow keys on a focused thumbnail move between photos.
+  const onThumbKeyDown = (index: number) => (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowRight") {
+      e.preventDefault()
+      setSelected(Math.min(media.length - 1, index + 1))
+    }
+    if (e.key === "ArrowLeft") {
+      e.preventDefault()
+      setSelected(Math.max(0, index - 1))
+    }
   }
-  const favErrorMessage = errorMessage(favAdd.error ?? favRemove.error)
 
   return (
     <div className="mx-auto max-w-275 px-4 py-6 sm:px-6 sm:py-8">
@@ -113,7 +176,14 @@ function DetailPage() {
         <div className="overflow-hidden rounded-2xl border bg-white">
           <div className="relative aspect-16/10 bg-muted">
             {cover ? (
-              <img src={cover} alt={listing.title} className="h-full w-full object-cover" />
+              <img
+                src={withCloudinaryTransform(cover, "f_auto,q_auto,w_1200")}
+                alt={`${listing.title}${media.length > 1 ? ` — photo ${active + 1} of ${media.length}` : ""}`}
+                width={1200}
+                height={750}
+                decoding="async"
+                className="h-full w-full object-cover"
+              />
             ) : (
               <div className="flex h-full w-full items-center justify-center text-sm text-muted-foreground">
                 No image
@@ -121,9 +191,7 @@ function DetailPage() {
             )}
             <div className="absolute left-3 top-3 flex gap-2">
               <span className="rounded-full shadow">
-                <Badge variant={listing.status === "avaiable" ? "success" : "secondary"}>
-                  {statusMap[listing.status] ?? listing.status}
-                </Badge>
+                <Badge variant={listing.status === "avaiable" ? "success" : "secondary"}>{statusLabel}</Badge>
               </span>
               {listing.furnished ? <Badge variant="overlay">Furnished</Badge> : null}
             </div>
@@ -134,10 +202,24 @@ function DetailPage() {
                 <button
                   key={m.id}
                   type="button"
-                  onClick={() => setActive(i)}
-                  className={`relative h-20 w-28 shrink-0 overflow-hidden rounded-lg border-2 ${i === active ? "border-primary" : "border-transparent"}`}
+                  onClick={() => setSelected(i)}
+                  onKeyDown={onThumbKeyDown(i)}
+                  aria-label={`View photo ${i + 1} of ${media.length}`}
+                  aria-current={i === active}
+                  className={cn(
+                    "relative h-20 w-28 shrink-0 overflow-hidden rounded-lg border-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                    i === active ? "border-primary" : "border-transparent",
+                  )}
                 >
-                  <img src={m.url} alt="" className="h-full w-full object-cover" />
+                  <img
+                    src={withCloudinaryTransform(m.url, "f_auto,q_auto,w_280")}
+                    alt=""
+                    width={280}
+                    height={200}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-full w-full object-cover"
+                  />
                 </button>
               ))}
             </div>
@@ -160,18 +242,19 @@ function DetailPage() {
                     <MapPin className="size-4" /> {listing.address}
                   </p>
                 </div>
-                {isAuthenticated && isVerified ? (
+                {canFavorite ? (
                   <Button
                     size="icon"
                     variant="outline"
-                    aria-label="Favorite"
+                    aria-label={isFavorited ? "Remove from favorites" : "Save to favorites"}
+                    aria-pressed={isFavorited}
                     onClick={() => {
-                      if (favAdd.isPending || favRemove.isPending) return
-                      favAdd.mutate()
+                      if (favPending) return
+                      favToggle.mutate()
                     }}
-                    title="Save to favorites"
+                    title={isFavorited ? "Remove from favorites" : "Save to favorites"}
                   >
-                    <Heart className="size-4" />
+                    <Heart className={cn("size-4", isFavorited && "fill-destructive text-destructive")} />
                   </Button>
                 ) : isAuthenticated && !isVerified ? (
                   <Button size="icon" variant="outline" disabled title="Verify email to favorite">
@@ -266,37 +349,20 @@ function DetailPage() {
                 </p>
               ) : null}
 
-              <div className="mt-4 flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    if (!isAuthenticated || !isVerified) return
-                    favAdd.mutate()
-                  }}
-                  disabled={favAdd.isPending || (isAuthenticated && !isVerified)}
-                  title={isAuthenticated && !isVerified ? "Verify email to favorite" : undefined}
-                >
-                  Save
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    if (!isAuthenticated || !isVerified) return
-                    favRemove.mutate()
-                  }}
-                  disabled={favRemove.isPending || (isAuthenticated && !isVerified)}
-                >
-                  Unsave
-                </Button>
-                {(favAdd.isSuccess || favRemove.isSuccess) && (
-                  <span className="text-xs text-success-600 self-center">Updated</span>
-                )}
-                {(favAdd.isError || favRemove.isError) && (
-                  <span className="text-xs text-destructive self-center">{favErrorMessage}</span>
-                )}
-              </div>
+              {canFavorite ? (
+                <div className="mt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => favToggle.mutate()}
+                    disabled={favPending}
+                    aria-pressed={isFavorited}
+                  >
+                    <Heart className={cn("size-3.5", isFavorited && "fill-current")} />
+                    {favPending ? "Saving…" : isFavorited ? "Saved" : "Save"}
+                  </Button>
+                </div>
+              ) : null}
             </div>
           </Card>
 
